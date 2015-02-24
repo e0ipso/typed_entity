@@ -104,6 +104,26 @@ That class will be discovered and returned by the factory function in
 $typed_entity = TypedEntityManager::create($entity_type, $entity);
 ```
 
+### Accessing the underlying entity
+This module uses the PHP magic methods to allow you to do things like:
+
+```php
+$typed_entity = TypedEntityManager::create($entity_type, $entity);
+
+// Access the uuid property on the underlying entity.
+print $typed_entity->uuid;
+
+// Set properties on the entity.
+$typed_entity->status = NODE_PUBLISHED;
+
+// Execute entity methods.
+print $typed_entity->myEntityMethod('arg1', 2);
+```
+
+This has the benefit (over doing `$typed_entity->getEntity()->myEntityMethod('arg1', 2)`)
+that you can then pass the `$typed_entity` in place of a node to functions that
+access the node properties or call custom methods on the entity.
+
 ## Benefits
 Besides [the benefits of OOP](https://duckduckgo.com/?q=object+oriented+programming+benefits)
 you can have more structured Drupal entities with clearer relationships. Stop
