@@ -13,11 +13,8 @@ class TypedEntityManager implements TypedEntityManagerInterface {
    * {@inheritdoc}
    */
   public static function create($entity_type, $entity) {
-    if ($class = static::getClass($entity_type, $entity)) {
-      new $class_name($entity_type, $entity);
-    }
-
-    return new TypedEntity($entity_type, $entity);
+    $class = static::getClass($entity_type, $entity);
+    new $class_name($entity_type, $entity);
   }
   
   /**
@@ -44,7 +41,8 @@ class TypedEntityManager implements TypedEntityManagerInterface {
     list( , , $bundle) = entity_extract_ids($entity_type, $entity);
     $cid = $entity_type . ':' . $bundle;
     if (!isset($classes[$cid])) {
-      $classes[$cid] = FALSE;
+      // The default class should always be TypedEntity.
+      $classes[$cid] = 'TypedEntity';
       $candidates = static::getClassNameCandidates($entity_type, $bundle);
       foreach ($candidates as $candidate) {
         if (class_exists($candidate)) {
