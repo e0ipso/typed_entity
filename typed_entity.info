@@ -1,0 +1,5 @@
+name = Typed Entity
+description = Provides classes based on the existing entities.
+dependencies[] = xautoload (>7.x-5.0)
+dependencies[] = entity
+core = 7.x

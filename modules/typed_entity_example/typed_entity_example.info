@@ -1,0 +1,5 @@
+name = Typed Entity Example
+description = Provides some examples for the typed entity module.
+dependencies[] = typed_entity
+dependencies[] = file_entity
+core = 7.x
