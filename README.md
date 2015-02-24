@@ -94,8 +94,8 @@ $ratio = $typed_article
 ## Usage
 To declare your typed entities you just have to create the class following the name convention:
 
-  - Typed<EntityTypeCamelCase><BundleCamelCase>
-  - Typed<EntityTypeCamelCase>
+  - Typed\<EntityTypeCamelCase\>\<BundleCamelCase\> (Ex: `TypedNodeArticle`).
+  - Typed\<EntityTypeCamelCase\> (Ex: `TypedUser`, `TypedNode`).
 
 That class will be discovered and returned by the factory function in
 `TypedEntityManager`. Use:
