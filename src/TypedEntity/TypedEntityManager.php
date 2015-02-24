@@ -13,19 +13,52 @@ class TypedEntityManager implements TypedEntityManagerInterface {
    * {@inheritdoc}
    */
   public static function create($entity_type, $entity) {
-    $class_names = static::getClassNames($entity_type, $entity);
-
-    foreach ($class_names as $class_name) {
-      if (class_exists($class_name)) {
-        new $class_name($entity_type, $entity);
-      }
+    if ($class = static::getClass($entity_type, $entity)) {
+      new $class_name($entity_type, $entity);
     }
 
     return new TypedEntity($entity_type, $entity);
   }
+  
+  /**
+   * Helper function to get a class name given an entity type and an entity.
+   * 
+   * @param string $entity_type
+   *   The entity type
+   * @param object $entity
+   *   The entity object.
+   * 
+   * @return string|bool
+   *   A valid class name if one exists, or FALSE if a class could not be found.
+   */
+  public static getClass($entity_type, $entity) {
+    $classes = &drupal_static(__METHOD__);
+    
+    if (!isset($classes)) {
+      if ($cache = cache_get('typed_entity_classes', 'cache_bootstrap')) {
+        $classes = $cache->data;
+      }
+    }
+    
+    list( , , $bundle) = entity_extract_ids($entity_type, $entity);
+    $cid = $entity_type . ':' . $bundle;
+    if (!isset($classes[$cid])) {
+      $classes[$cid] = FALSE;
+      $candidates = static::getClassNameCandidates($entity_type, $bundle);
+      foreach ($candidates as $candidate) {
+        if (class_exists($candidate)) {
+          $classes[$cid] = $candidate;
+          break;
+        }
+      }
+      cache_set('typed_entity_classes', $classes, 'cache_bootstrap');
+    }
+    
+    return $classes[$cid];
+  }
 
   /**
-   * Helper function to get a class name based on the entity type and bundle.
+   * Helper function to get possible class names for a given entity type and bundle.
    *
    * If you want your entity types to be auto loaded then you need to place your
    * class in your custom module, under src/TypedEntity. The class needs to be
@@ -34,16 +67,15 @@ class TypedEntityManager implements TypedEntityManagerInterface {
    *
    * @param string $entity_type
    *   The type of the entity.
-   * @param object $entity
-   *   The fully loaded entity.
+   * @param string $bundle
+   *   The bundle of the entity.
    *
    * @return array
    *   An array of class name candidates.
    */
-  protected static function getClassNames($entity_type, $entity) {
+  protected static function getClassNameCandidates($entity_type, $bundle) {
     $names = array();
     $class_name_entity = 'Typed' . static::camelize($entity_type);
-    list(,, $bundle) = entity_extract_ids($entity_type, $entity);
     $class_name_bundle = 'Typed' . static::camelize($entity_type) . static::camelize($bundle);
     foreach (module_list() as $module_name) {
       // It is important to add the most specific first.
