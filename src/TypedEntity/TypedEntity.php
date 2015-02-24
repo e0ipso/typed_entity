@@ -160,4 +160,20 @@ class TypedEntity implements TypedEntityInterface {
     $this->getEntity()->{$property_name} = $value;
   }
 
+  /**
+   * Implements the magic methods to proxy methods to the entity.
+   *
+   * @return mixed
+   *   The value returned by the entity method.
+   */
+  public function __call() {
+    $args = func_get_args();
+    $method_name = array_shift($args);
+    $callable = array($this->getEntity(), $method_name);
+    if (is_callable($callable)) {
+      return call_user_func_array($callable, $args);
+    }
+    return NULL;
+  }
+
 }
