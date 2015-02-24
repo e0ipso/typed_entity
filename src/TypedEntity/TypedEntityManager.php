@@ -35,6 +35,7 @@ class TypedEntityManager implements TypedEntityManagerInterface {
     $classes = &drupal_static(__METHOD__);
     
     if (!isset($classes)) {
+      $classes = array();
       if ($cache = cache_get('typed_entity_classes', 'cache_bootstrap')) {
         $classes = $cache->data;
       }
