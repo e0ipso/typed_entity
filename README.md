@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/mateu-aguilo-bosch/typed_entity.svg)](https://travis-ci.org/mateu-aguilo-bosch/typed_entity)
+
 # Typed entity
 
 ```
