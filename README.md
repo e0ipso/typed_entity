@@ -132,3 +132,5 @@ type and bundle.
 
 Care to add **tests**? You can even have unit testing on your custom business logic
 (make sure those computations on the aspect ratio return the expected values).
+
+Check out the [unit test example](blob/7.x-1.x/modules/typed_entity_example/lib/Drupal/typed_entity_example/Tests/TypedEntityUnitTestCase.php).
