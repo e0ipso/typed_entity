@@ -44,7 +44,8 @@ class TypedEntityExampleWebTestCase extends \DrupalWebTestCase {
       'title' => 'Test article',
     ));
     $typed_article = TypedEntityManager::create('node', $article);
-    if ($typed_article instanceof Article) {
+    $reflection_article = new \ReflectionClass($typed_article);
+    if ($reflection_article->getName() == 'Drupal\typed_entity_example\TypedEntity\Node\Article') {
       $this->pass('The hook_typed_entity_registry_info is taking precedence.');
     }
     else {
@@ -57,7 +58,9 @@ class TypedEntityExampleWebTestCase extends \DrupalWebTestCase {
       'title' => 'Test article',
     ));
     $typed_page = TypedEntityManager::create('node', $page);
-    if ($typed_page instanceof TypedNode) {
+
+    $reflection_page = new \ReflectionClass($typed_page);
+    if ($reflection_page->getName() == 'Drupal\typed_entity_example\TypedEntity\TypedNode') {
       $this->pass('The factory is falling back to TypedNode.');
     }
     else {
@@ -67,7 +70,8 @@ class TypedEntityExampleWebTestCase extends \DrupalWebTestCase {
     // Test the fallback to TypedEntity.
     $account = $this->drupalCreateUser();
     $typed_user = TypedEntityManager::create('user', $account);
-    if ($typed_user instanceof TypedEntity) {
+    $reflection_user = new \ReflectionClass($typed_user);
+    if ($reflection_user->getName() == 'Drupal\typed_entity\TypedEntity\TypedEntity') {
       $this->pass('The factory is falling back to TypedEntity.');
     }
     else {

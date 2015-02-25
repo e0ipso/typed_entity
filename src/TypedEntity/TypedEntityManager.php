@@ -88,7 +88,7 @@ class TypedEntityManager implements TypedEntityManagerInterface {
       if (empty($candidate['bundle'])) {
         $candidate_entity_type = $candidate['class'];
       }
-      if ($candidate['bundle'] = $bundle) {
+      if ($candidate['bundle'] == $bundle) {
         $candidate_bundle = $candidate['class'];
       }
     }
@@ -99,13 +99,13 @@ class TypedEntityManager implements TypedEntityManagerInterface {
     if (!empty($candidate_bundle)) {
       $names[] = $candidate_bundle;
     }
-    $names += static::getClassNameCandidatesBundle($entity_type, $bundle);
+    $names = array_merge($names, static::getClassNameCandidatesBundle($entity_type, $bundle));
 
     // Then add the generic ones for entity types.
     if (!empty($candidate_entity_type)) {
       $names[] = $candidate_entity_type;
     }
-    $names += static::getClassNameCandidatesEntity($entity_type);
+    $names = array_merge($names, static::getClassNameCandidatesEntity($entity_type));
 
     return $names;
   }
