@@ -8,6 +8,19 @@
 use Drupal\typed_entity\TypedEntity\TypedEntityManager;
 
 /**
+ * Implements hook_typed_entity_registry_info().
+ */
+function typed_entity_example_typed_entity_registry_info() {
+  $items['article'] = array(
+    'entity_type' => 'node',
+    'bundle' => 'article',
+    'class' => '\\Drupal\\typed_entity_example\\TypedEntity\\Node\\Article',
+  );
+
+  return $items;
+}
+
+/**
  * Implements hook_menu().
  */
 function typed_entity_example_menu() {
@@ -32,7 +45,7 @@ function typed_entity_example_menu() {
  *   The page content.
  */
 function typed_entity_example_node_typed($node) {
-  /** @var \Drupal\typed_entity_example\TypedEntity\TypedNodeArticle $typed_node */
+  /** @var \Drupal\typed_entity_example\TypedEntity\Node\Article $typed_node */
   $typed_node = TypedEntityManager::create('node', $node);
   drupal_set_title($typed_node->title);
 

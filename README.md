@@ -106,6 +106,27 @@ That class will be discovered and returned by the factory function in
 $typed_entity = TypedEntityManager::create($entity_type, $entity);
 ```
 
+If you don't like the naming convention or you prefer to use something else, you can provide the class for your entity. For that you will have to implement `hook_typed_entity_registry_info`. See [the example](modules/typed_entity_example/typed_entity_example.module).
+
+```php
+/**
+ * Implements hook_module_typed_entity_registry_info().
+ */
+function custom_module_typed_entity_registry_info() {
+  $items['user'] = array(
+    'entity_type' => 'user',
+    'class' => '\Drupal\custom_module\Foo\Bar\User',
+  );
+  $items['file'] = array(
+    'entity_type' => 'file',
+    'bundle' => 'image',
+    'class' => '\Drupal\custom_module\File\Image',
+  );
+
+  return $items;
+}
+```
+
 ### Accessing the underlying entity
 This module uses the PHP magic methods to allow you to do things like:
 

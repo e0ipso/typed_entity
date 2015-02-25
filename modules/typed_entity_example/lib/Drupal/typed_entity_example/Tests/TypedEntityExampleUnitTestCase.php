@@ -19,7 +19,7 @@ class TypedEntityExampleUnitTestCase extends \DrupalUnitTestCase {
    */
   public static function getInfo() {
     return array(
-      'name' => 'Typed entity example',
+      'name' => 'Typed entity example (unit)',
       'description' => 'Shows an example of how you can do unit testing of your code.',
       'group' => 'Typed Entity',
     );

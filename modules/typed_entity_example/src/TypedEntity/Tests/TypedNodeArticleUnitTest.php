@@ -7,9 +7,9 @@
 
 namespace Drupal\typed_entity_example\TypedEntity\Tests;
 
-use Drupal\typed_entity_example\TypedEntity\TypedNodeArticle;
+use Drupal\typed_entity_example\TypedEntity\Node\Article;
 
-class TypedNodeArticleUnitTest extends TypedNodeArticle {
+class TypedNodeArticleUnitTest extends Article {
 
   /**
    * Overrides TypedNodeArticle::t().
