@@ -79,18 +79,42 @@ class TypedEntityManager implements TypedEntityManagerInterface {
    *   An array of class name candidates.
    */
   protected static function getClassNameCandidates($entity_type, $bundle) {
-    $names = array();
-    $class_names = array();
-    if (!empty($bundle)) {
-      $class_names[] = 'Typed' . static::camelize($entity_type) . static::camelize($bundle);
-    }
-    // It is important to add the most specific first.
-    $class_names[] = 'Typed' . static::camelize($entity_type);
-    foreach (module_list() as $module_name) {
-      foreach ($class_names as $class_name) {
-        $names[] = '\\Drupal\\' . $module_name . '\\TypedEntity\\' . $class_name;
+    $candidates = module_invoke_all('typed_entity_registry_info');
+    $candidate_entity_type = $candidate_bundle = '';
+    foreach ($candidates as $candidate) {
+      if ($candidate['entity_type'] == $entity_type && empty($candidate['bundle'])) {
+        $candidate_entity_type = $candidate['class'];
+      }
+      else if ($candidate['entity_type'] == $entity_type && $candidate['bundle'] = $bundle) {
+        $candidate_bundle = $candidate['class'];
       }
     }
+    $names = array();
+    if (!empty($bundle)) {
+      $class_name_bundle = 'Typed' . static::camelize($entity_type) . static::camelize($bundle);
+    }
+    $class_name_entity_type = 'Typed' . static::camelize($entity_type);
+    $module_list = module_list();
+
+    // First add the specific suggestions for bundles. It is important to add
+    // the most specific first.
+    if (!empty($class_name_bundle)) {
+      if (!empty($candidate_bundle)) {
+        $names[] = $candidate_bundle;
+      }
+      foreach ($module_list as $module_name) {
+        $names[] = '\\Drupal\\' . $module_name . '\\TypedEntity\\' . $class_name_bundle;
+      }
+    }
+
+    // Then add the generic ones for entity types.
+    if (!empty($candidate_entity_type)) {
+      $names[] = $candidate_entity_type;
+    }
+    foreach ($module_list as $module_name) {
+      $names[] = '\\Drupal\\' . $module_name . '\\TypedEntity\\' . $class_name_entity_type;
+    }
+
     return $names;
   }
 

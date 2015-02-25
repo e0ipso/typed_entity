@@ -2,15 +2,16 @@
 
 /**
  * @file
- * Contains \Drupal\typed_entity_example\TypedEntity\TypedNodeArticle.
+ * Contains \Drupal\typed_entity_example\TypedEntity\Node\Article.
  */
 
-namespace Drupal\typed_entity_example\TypedEntity;
+namespace Drupal\typed_entity_example\TypedEntity\Node;
 
 use Drupal\typed_entity\TypedEntity\TypedEntityInterface;
 use Drupal\typed_entity\TypedEntity\TypedEntityManager;
+use Drupal\typed_entity_example\TypedEntity\TypedNode;
 
-class TypedNodeArticle extends TypedNode implements TypedNodeArticleInterface {
+class Article extends TypedNode implements ArticleInterface {
 
   /**
    * The article image.

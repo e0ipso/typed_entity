@@ -2,14 +2,15 @@
 
 /**
  * @file
- * Contains \Drupal\typed_entity_example\TypedEntity\TypedNodeArticleInterface.
+ * Contains \Drupal\typed_entity_example\TypedEntity\Node\ArticleInterface.
  */
 
-namespace Drupal\typed_entity_example\TypedEntity;
+namespace Drupal\typed_entity_example\TypedEntity\Node;
 
 use Drupal\typed_entity\TypedEntity\TypedEntityInterface;
+use Drupal\typed_entity_example\TypedEntity\TypedNodeInterface;
 
-interface TypedNodeArticleInterface extends TypedNodeInterface {
+interface ArticleInterface extends TypedNodeInterface {
 
   /**
    * Gets the author of the node.
