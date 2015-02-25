@@ -45,7 +45,7 @@ class TypedEntityExampleWebTestCase extends \DrupalWebTestCase {
     ));
     $typed_article = TypedEntityManager::create('node', $article);
     $reflection_article = new \ReflectionClass($typed_article);
-    if ($reflection_article->getName() == 'Drupal\typed_entity_example\TypedEntity\Node\Article') {
+    if ($reflection_article->name == 'Drupal\typed_entity_example\TypedEntity\Node\Article') {
       $this->pass('The hook_typed_entity_registry_info is taking precedence.');
     }
     else {
@@ -60,7 +60,7 @@ class TypedEntityExampleWebTestCase extends \DrupalWebTestCase {
     $typed_page = TypedEntityManager::create('node', $page);
 
     $reflection_page = new \ReflectionClass($typed_page);
-    if ($reflection_page->getName() == 'Drupal\typed_entity_example\TypedEntity\TypedNode') {
+    if ($reflection_page->name == 'Drupal\typed_entity_example\TypedEntity\TypedNode') {
       $this->pass('The factory is falling back to TypedNode.');
     }
     else {
@@ -71,7 +71,7 @@ class TypedEntityExampleWebTestCase extends \DrupalWebTestCase {
     $account = $this->drupalCreateUser();
     $typed_user = TypedEntityManager::create('user', $account);
     $reflection_user = new \ReflectionClass($typed_user);
-    if ($reflection_user->getName() == 'Drupal\typed_entity\TypedEntity\TypedEntity') {
+    if ($reflection_user->name == 'Drupal\typed_entity\TypedEntity\TypedEntity') {
       $this->pass('The factory is falling back to TypedEntity.');
     }
     else {
