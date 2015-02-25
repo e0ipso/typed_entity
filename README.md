@@ -41,9 +41,9 @@ variations –even those that don't relate to image ratio. Gasp!–.
 
 ## Proposal
 
-Create a typed entity in your custom module under `src/TypedEntity` and make it implement `TypedEntityInterface`. Basically you just have to follow [the example](blob/7.x-1.x/modules/typed_entity_example/src/TypedEntity/TypedNode.php).
+Create a typed entity in your custom module under `src/TypedEntity` and make it implement `TypedEntityInterface`. Basically you just have to follow [the example](modules/typed_entity_example/src/TypedEntity/TypedNode.php).
 
-For our example above we would create [`TypedNodeArticle`](blob/7.x-1.x/modules/typed_entity_example/src/TypedEntity/TypedNodeArticle.php) and then another class called `TypedFileImage`. `TypedFileImage` would have a method to get the aspect ratio:
+For our example above we would create [`TypedNodeArticle`](modules/typed_entity_example/src/TypedEntity/TypedNodeArticle.php) and then another class called `TypedFileImage`. `TypedFileImage` would have a method to get the aspect ratio:
 
 ```php
 <?php
@@ -133,4 +133,4 @@ type and bundle.
 Care to add **tests**? You can even have unit testing on your custom business logic
 (make sure those computations on the aspect ratio return the expected values).
 
-Check out the [unit test example](blob/7.x-1.x/modules/typed_entity_example/lib/Drupal/typed_entity_example/Tests/TypedEntityUnitTestCase.php).
+Check out the [unit test example](modules/typed_entity_example/lib/Drupal/typed_entity_example/Tests/TypedEntityUnitTestCase.php).
