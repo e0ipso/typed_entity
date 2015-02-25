@@ -2,15 +2,14 @@
 
 /**
  * @file
- * Contains \Drupal\typed_entity_example\Tests\TypedEntityUnitTestCase
+ * Contains \Drupal\typed_entity_example\Tests\TypedEntityExampleUnitTestCase
  */
 
 namespace Drupal\typed_entity_example\Tests;
 
 use Drupal\typed_entity_example\TypedEntity\Tests\TypedNodeArticleUnitTest;
-use Drupal\typed_entity_example\TypedEntity\TypedNodeArticle;
 
-class TypedEntityUnitTestCase extends \DrupalUnitTestCase {
+class TypedEntityExampleUnitTestCase extends \DrupalUnitTestCase {
 
   /**
    * Declare test information.
