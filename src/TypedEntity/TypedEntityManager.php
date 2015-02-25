@@ -17,7 +17,7 @@ class TypedEntityManager implements TypedEntityManagerInterface {
 
     foreach ($class_names as $class_name) {
       if (class_exists($class_name)) {
-        new $class_name($entity_type, $entity);
+        return new $class_name($entity_type, $entity);
       }
     }
 
