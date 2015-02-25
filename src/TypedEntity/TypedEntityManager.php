@@ -29,7 +29,7 @@ class TypedEntityManager implements TypedEntityManagerInterface {
    *   A valid class name if one exists. It defaults to TypedEntity.
    */
   public static function getClass($entity_type, $entity) {
-    $classes = &drupal_static(__CLASS__ . '::' . __METHOD__);
+    $classes = &drupal_static(__METHOD__);
     list( , , $bundle) = entity_extract_ids($entity_type, $entity);
     $cid = $entity_type . ':' . $bundle;
 
