@@ -14,7 +14,7 @@ class TypedEntityManager implements TypedEntityManagerInterface {
    */
   public static function create($entity_type, $entity) {
     $class_name = static::getClass($entity_type, $entity);
-    return new $class_name($entity_type, $entity);
+    return new $class_name($entity_type, NULL, $entity);
   }
 
   /**

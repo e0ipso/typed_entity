@@ -7,6 +7,9 @@
 
 namespace Drupal\typed_entity_example\Tests;
 
+use Drupal\typed_entity_example\TypedEntity\Tests\TypedNodeArticleUnitTest;
+use Drupal\typed_entity_example\TypedEntity\TypedNodeArticle;
+
 class TypedEntityUnitTestCase extends \DrupalUnitTestCase {
 
   /**
@@ -17,9 +20,9 @@ class TypedEntityUnitTestCase extends \DrupalUnitTestCase {
    */
   public static function getInfo() {
     return array(
-      'name' => 'Plug display name',
-      'description' => 'Test the display name method functionality.',
-      'group' => 'Plug',
+      'name' => 'Typed entity example',
+      'description' => 'Shows an example of how you can do unit testing of your code.',
+      'group' => 'Typed Entity',
     );
   }
 
@@ -34,11 +37,14 @@ class TypedEntityUnitTestCase extends \DrupalUnitTestCase {
     spl_autoload_unregister('drupal_autoload_interface');
 
     parent::setUp();
-
-    // Get a new Name plugin manager to instantiate the test plugins.
-    $this->manager = NamePluginManager::create();
   }
 
-
+  /**
+   * Test logging message.
+   */
+  public function testLoggingMessage() {
+    $typed_article = new TypedNodeArticleUnitTest('node', 1, NULL, 'article');
+    $this->assertEqual($typed_article->getLoggingMessage(), 'User with id 1. Node with title Foo. Status 1.', 'Logging message is successful.');
+  }
 
 }
