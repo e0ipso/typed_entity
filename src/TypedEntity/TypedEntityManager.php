@@ -63,7 +63,7 @@ class TypedEntityManager implements TypedEntityManagerInterface {
   }
 
   /**
-   * Helper function to get possible class names for a given entity type and bundle.
+   * Helper function to get possible class names given entity type & bundle.
    *
    * If you want your entity types to be auto loaded then you need to place your
    * class in your custom module, under src/TypedEntity. The class needs to be
@@ -82,37 +82,73 @@ class TypedEntityManager implements TypedEntityManagerInterface {
     $candidates = module_invoke_all('typed_entity_registry_info');
     $candidate_entity_type = $candidate_bundle = '';
     foreach ($candidates as $candidate) {
-      if ($candidate['entity_type'] == $entity_type && empty($candidate['bundle'])) {
+      if ($candidate['entity_type'] != $entity_type) {
+        continue;
+      }
+      if (empty($candidate['bundle'])) {
         $candidate_entity_type = $candidate['class'];
       }
-      else if ($candidate['entity_type'] == $entity_type && $candidate['bundle'] = $bundle) {
+      if ($candidate['bundle'] = $bundle) {
         $candidate_bundle = $candidate['class'];
       }
     }
     $names = array();
-    if (!empty($bundle)) {
-      $class_name_bundle = 'Typed' . static::camelize($entity_type) . static::camelize($bundle);
-    }
-    $class_name_entity_type = 'Typed' . static::camelize($entity_type);
-    $module_list = module_list();
 
     // First add the specific suggestions for bundles. It is important to add
     // the most specific first.
-    if (!empty($class_name_bundle)) {
-      if (!empty($candidate_bundle)) {
-        $names[] = $candidate_bundle;
-      }
-      foreach ($module_list as $module_name) {
-        $names[] = '\\Drupal\\' . $module_name . '\\TypedEntity\\' . $class_name_bundle;
-      }
+    if (!empty($candidate_bundle)) {
+      $names[] = $candidate_bundle;
     }
+    $names += static::getClassNameCandidatesBundle($entity_type, $bundle);
 
     // Then add the generic ones for entity types.
     if (!empty($candidate_entity_type)) {
       $names[] = $candidate_entity_type;
     }
-    foreach ($module_list as $module_name) {
+    $names += static::getClassNameCandidatesEntity($entity_type);
+
+    return $names;
+  }
+
+  /**
+   * Helper function to get possible class names given entity type & bundle.
+   *
+   * @param string $entity_type
+   *   The type of the entity.
+   *
+   * @return array
+   *   An array of class name candidates.
+   */
+  protected static function getClassNameCandidatesEntity($entity_type) {
+    $names = array();
+    $class_name_entity_type = 'Typed' . static::camelize($entity_type);
+    foreach (module_list() as $module_name) {
       $names[] = '\\Drupal\\' . $module_name . '\\TypedEntity\\' . $class_name_entity_type;
+    }
+
+    return $names;
+  }
+
+  /**
+   * Helper function to get possible class names given entity type & bundle.
+   *
+   * @param string $entity_type
+   *   The type of the entity.
+   * @param string $bundle
+   *   The bundle of the entity.
+   *
+   * @return array
+   *   An array of class name candidates.
+   */
+  protected static function getClassNameCandidatesBundle($entity_type, $bundle) {
+    $names = array();
+
+    if (empty($bundle)) {
+      return $names;
+    }
+    $class_name_bundle = 'Typed' . static::camelize($entity_type) . static::camelize($bundle);
+    foreach (module_list() as $module_name) {
+      $names[] = '\\Drupal\\' . $module_name . '\\TypedEntity\\' . $class_name_bundle;
     }
 
     return $names;
