@@ -19,4 +19,12 @@ interface TypedNodeArticleInterface extends TypedNodeInterface {
    */
   public function getImage();
 
+  /**
+   * Generates a message suited for logging.
+   *
+   * @return string
+   *   The message.
+   */
+  public function getLoggingMessage();
+
 }

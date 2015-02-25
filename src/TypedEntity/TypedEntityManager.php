@@ -14,7 +14,7 @@ class TypedEntityManager implements TypedEntityManagerInterface {
    */
   public static function create($entity_type, $entity) {
     $class_name = static::getClass($entity_type, $entity);
-    return new $class_name($entity_type, $entity);
+    return new $class_name($entity_type, NULL, $entity);
   }
 
   /**
@@ -30,29 +30,34 @@ class TypedEntityManager implements TypedEntityManagerInterface {
    */
   public static function getClass($entity_type, $entity) {
     $classes = &drupal_static(__CLASS__ . '::' . __METHOD__);
-
-    if (!isset($classes)) {
-      $classes = array();
-      if ($cache = cache_get('typed_entity_classes', 'cache_bootstrap')) {
-        $classes = $cache->data;
-      }
-    }
-
     list( , , $bundle) = entity_extract_ids($entity_type, $entity);
     $cid = $entity_type . ':' . $bundle;
-    if (!isset($classes[$cid])) {
-      // The default class should always be TypedEntity. Assume that TypedEntity
-      // is under the same namespace as TypedEntityManager.
-      $classes[$cid] = __NAMESPACE__ . '\\TypedEntity';
-      $candidates = static::getClassNameCandidates($entity_type, $bundle);
-      foreach ($candidates as $candidate) {
-        if (class_exists($candidate)) {
-          $classes[$cid] = $candidate;
-          break;
-        }
-      }
-      cache_set('typed_entity_classes', $classes, 'cache_bootstrap');
+
+    if (isset($classes[$cid])) {
+      return $classes[$cid];
     }
+
+    $cached_classes = array();
+    if ($cache = cache_get('typed_entity_classes', 'cache_bootstrap')) {
+      $cached_classes = $cache->data;
+    }
+
+    $classes = array_merge($cached_classes, isset($classes) ? $classes : array());
+    if (isset($classes[$cid])) {
+      return $classes[$cid];
+    }
+
+    // The default class should always be TypedEntity. Assume that TypedEntity
+    // is under the same namespace as TypedEntityManager.
+    $classes[$cid] = '\\' . __NAMESPACE__ . '\\TypedEntity';
+    $candidates = static::getClassNameCandidates($entity_type, $bundle);
+    foreach ($candidates as $candidate) {
+      if (class_exists($candidate)) {
+        $classes[$cid] = $candidate;
+        break;
+      }
+    }
+    cache_set('typed_entity_classes', $classes, 'cache_bootstrap');
 
     return $classes[$cid];
   }

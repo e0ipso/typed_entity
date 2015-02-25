@@ -7,6 +7,8 @@
 
 namespace Drupal\typed_entity\TypedEntity;
 
+use Drupal\typed_entity\Exception\TypedEntityException;
+
 class TypedEntity implements TypedEntityInterface {
 
   /**
@@ -49,29 +51,44 @@ class TypedEntity implements TypedEntityInterface {
    *
    * @param string $entity_type
    *   The type of the entity.
-   * @param mixed $entity_id
-   *   Either the entity ID or the fully loaded entity.
+   * @param int $entity_id
+   *   The entity ID.
+   * @param object $entity
+   *   The fully loaded entity.
+   * @param string $bundle
+   *   (Optional). Allow forcing a bundle. This is mainly for unit testing.
+   *
+   * @throws \Drupal\typed_entity\Exception\TypedEntityException
+   * @throws \EntityMalformedException
    */
-  public function __construct($entity_type, $entity_id) {
-    $this->entityType = $entity_type;
-
-    if (is_numeric($entity_id)) {
-      $this->entityId = $entity_id;
-      return;
+  public function __construct($entity_type, $entity_id = NULL, $entity = NULL, $bundle = NULL) {
+    if (empty($entity_type)) {
+      throw new TypedEntityException('You need to provide the entity type for the TypedEntity.');
     }
-    // The entity was provided.
-    $entity = $entity_id;
-
-    list($entity_id,, $bundle) = entity_extract_ids($entity_type, $entity);
+    if (empty($entity_id) && empty($entity)) {
+      throw new TypedEntityException('You need to provide the fully loaded entity or the entity ID.');
+    }
+    $this->entityType = $entity_type;
     $this->entityId = $entity_id;
-    $this->bundle = $bundle;
     $this->entity = $entity;
+    $this->bundle = $bundle;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getEntityId() {
+    if (isset($this->entityId)) {
+      return $this->entityId;
+    }
+    if (empty($this->entity)) {
+      // This means that somehow we do not have neither entity nor entity ID.
+      throw new TypedEntityException('You need to provide the fully loaded entity or the entity ID.');
+    }
+    list($entity_id, , $bundle) = entity_extract_ids($this->getEntityType(), $this->entity);
+    $this->entityId = $entity_id;
+    $this->bundle = $bundle;
+
     return $this->entityId;
   }
 
@@ -82,7 +99,8 @@ class TypedEntity implements TypedEntityInterface {
     if (isset($this->entity)) {
       return $this->entity;
     }
-    if (empty($this->getEntityId())) {
+    $entity_id = $this->getEntityId();
+    if (empty($entity_id)) {
       // We do not have neither entity nor ID. We cannot load.
       return NULL;
     }
@@ -106,7 +124,8 @@ class TypedEntity implements TypedEntityInterface {
       return $this->bundle;
     }
 
-    list(,, $bundle) = entity_extract_ids($this->getEntityType(), $this->getEntity());
+    list($entity_id, , $bundle) = entity_extract_ids($this->getEntityType(), $this->getEntity());
+    $this->entityId = $entity_id;
     $this->bundle = $bundle;
     return $this->bundle;
   }
@@ -163,15 +182,18 @@ class TypedEntity implements TypedEntityInterface {
   /**
    * Implements the magic methods to proxy methods to the entity.
    *
+   * @param string $name
+   *   The method name.
+   * @param array $arguments
+   *   The arguments.
+   *
    * @return mixed
    *   The value returned by the entity method.
    */
-  public function __call() {
-    $args = func_get_args();
-    $method_name = array_shift($args);
-    $callable = array($this->getEntity(), $method_name);
+  public function __call($name, array $arguments) {
+    $callable = array($this->getEntity(), $name);
     if (is_callable($callable)) {
-      return call_user_func_array($callable, $args);
+      return call_user_func_array($callable, $arguments);
     }
     return NULL;
   }

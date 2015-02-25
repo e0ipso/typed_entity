@@ -1,0 +1,55 @@
+<?php
+
+/**
+ * @file
+ * Module implementation file.
+ */
+
+use Drupal\typed_entity\TypedEntity\TypedEntityManager;
+
+/**
+ * Implements hook_menu().
+ */
+function typed_entity_example_menu() {
+  $items['node/%node/typed'] = array(
+    'title' => 'Typed node',
+    'description' => 'Shows the typed node.',
+    'page callback' => 'typed_entity_example_node_typed',
+    'page arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    'access arguments' => array('administer nodes'),
+  );
+  return $items;
+}
+
+/**
+ * Page callback that displays the typed entity.
+ *
+ * @param object $node
+ *   The loaded node.
+ *
+ * @return string
+ *   The page content.
+ */
+function typed_entity_example_node_typed($node) {
+  /** @var \Drupal\typed_entity_example\TypedEntity\TypedNodeArticle $typed_node */
+  $typed_node = TypedEntityManager::create('node', $node);
+  drupal_set_title($typed_node->title);
+
+  $typed_image = $typed_node->getImage();
+  $output = array();
+  $uri = $typed_image->uri;
+  if (!empty($uri)) {
+    $output['image'] = array(
+      '#theme' => 'image',
+      '#path' => $typed_image->uri,
+    );
+  }
+  $output['debug'] = array(
+    '#type' => 'html_tag',
+    '#tag' => 'pre',
+    '#value' => print_r($typed_node, TRUE),
+  );
+
+  return $output;
+}
