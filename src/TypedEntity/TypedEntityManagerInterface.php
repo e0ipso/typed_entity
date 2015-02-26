@@ -22,4 +22,15 @@ interface TypedEntityManagerInterface {
    */
   public static function create($entity_type, $entity);
 
+  /**
+   * Turns a string into camel case. From search_api_index to SearchApiIndex.
+   *
+   * @param string $input
+   *   The input string.
+   *
+   * @return string
+   *   The camelized string.
+   */
+  public static function camelize($input);
+
 }

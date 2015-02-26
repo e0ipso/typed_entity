@@ -155,15 +155,9 @@ class TypedEntityManager implements TypedEntityManagerInterface {
   }
 
   /**
-   * Turns a string into camel case. From search_api_index to SearchApiIndex.
-   *
-   * @param string $input
-   *   The input string.
-   *
-   * @return string
-   *   The camelized string.
+   * {@inheritdoc}
    */
-  protected static function camelize($input) {
+  public static function camelize($input) {
     $input = preg_replace('/[-_]/', ' ', $input);
     $input = ucwords($input);
     $parts = explode(' ', $input);
