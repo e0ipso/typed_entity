@@ -30,7 +30,7 @@ class TypedEntityManager implements TypedEntityManagerInterface {
    */
   public static function getClass($entity_type, $entity) {
     $classes = &drupal_static(__METHOD__);
-    list( , , $bundle) = entity_extract_ids($entity_type, $entity);
+    list(,, $bundle) = entity_extract_ids($entity_type, $entity);
     $cid = $entity_type . ':' . $bundle;
 
     if (isset($classes[$cid])) {
@@ -164,9 +164,9 @@ class TypedEntityManager implements TypedEntityManagerInterface {
    *   The camelized string.
    */
   protected static function camelize($input) {
-    $input = preg_replace('/-_/', ' ', $input);
+    $input = preg_replace('/[-_]/', ' ', $input);
     $input = ucwords($input);
-    $parts = explode('_', $input);
+    $parts = explode(' ', $input);
     return implode('', $parts);
   }
 
