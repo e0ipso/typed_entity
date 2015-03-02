@@ -2,7 +2,7 @@
 
 # Typed entity
 
-_Use Typed Entity as a namespace for your business logic. Do not use functions –declared in the global scope–, but use the typed entity class to **write your methods in the correct scope**._
+_Use Typed Entity as a namespace for your business logic. It **provides a scope to place your business logic**, and help you keep your global scope clean of myriads of small functions._
 
 This module provides a simple way to treat you existing entities like typed
 objects. This will allow you to have a more maintainable and easier to debug
