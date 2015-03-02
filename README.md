@@ -45,7 +45,7 @@ variations –even those that don't relate to image ratio. Gasp!–.
 
 Create a typed entity in your custom module under `src/TypedEntity` and make it implement `TypedEntityInterface`. Basically you just have to follow [the example](modules/typed_entity_example/src/TypedEntity/TypedNode.php).
 
-For our example above we would create [`TypedNodeArticle`](modules/typed_entity_example/src/TypedEntity/TypedNodeArticle.php) and then another class called `TypedFileImage`. `TypedFileImage` would have a method to get the aspect ratio:
+For our example above we would create [`TypedNodeArticle`](modules/typed_entity_example/src/TypedEntity/Node/Article.php) and then another class called `TypedFileImage`. `TypedFileImage` would have a method to get the aspect ratio:
 
 ```php
 <?php
