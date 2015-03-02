@@ -3,7 +3,7 @@
 # Typed entity
 
 ```
-Use typed objects for your Drupal entities.
+Use lightweight typed objects for your Drupal entities.
 ```
 
 This module provides a simple way to treat you existing entities like typed
