@@ -77,6 +77,9 @@ class TypedFileImage extends TypedEntity implements TypedFileImageInterface {
 Now you can do things like:
 
 ```php
+// Use the following comment to hint your IDE about the object type. That will
+// enable IDE autocomplete.
+/** @var \Drupal\typed_entity_example\TypedEntity\Node\Article $typed_node */
 $typed_article = TypedEntityManager::create('node', $node);
 
 // custom_module_article_image_ratio(…)
