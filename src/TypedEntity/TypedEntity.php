@@ -137,7 +137,8 @@ class TypedEntity implements TypedEntityInterface {
     if (isset($this->wrapper)) {
       return $this->wrapper;
     }
-    return entity_metadata_wrapper($this->getEntityType(), $this->getEntity());
+    $this->wrapper = entity_metadata_wrapper($this->getEntityType(), $this->getEntity());
+    return $this->wrapper;
   }
 
   /**
