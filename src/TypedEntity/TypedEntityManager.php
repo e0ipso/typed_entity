@@ -88,7 +88,7 @@ class TypedEntityManager implements TypedEntityManagerInterface {
       if (empty($candidate['bundle'])) {
         $candidate_entity_type = $candidate['class'];
       }
-      if ($candidate['bundle'] == $bundle) {
+      if (!empty($candidate['bundle']) && $candidate['bundle'] == $bundle) {
         $candidate_bundle = $candidate['class'];
       }
     }
