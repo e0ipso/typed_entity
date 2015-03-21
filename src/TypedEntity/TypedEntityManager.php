@@ -7,12 +7,22 @@
 
 namespace Drupal\typed_entity\TypedEntity;
 
+use Drupal\xautoload\DrupalSystem\DrupalSystemInterface;
+
 class TypedEntityManager implements TypedEntityManagerInterface {
+
+  /**
+   * Drupal system wrapper.
+   *
+   * @var DrupalSystemInterface
+   */
+  protected static $system;
 
   /**
    * {@inheritdoc}
    */
   public static function create($entity_type, $entity) {
+    static::$system = xautoload()->getServiceContainer()->get('system');
     $class_name = static::getClass($entity_type, $entity);
     return new $class_name($entity_type, NULL, $entity);
   }
@@ -122,7 +132,7 @@ class TypedEntityManager implements TypedEntityManagerInterface {
   protected static function getClassNameCandidatesEntity($entity_type) {
     $names = array();
     $class_name_entity_type = 'Typed' . static::camelize($entity_type);
-    foreach (module_list() as $module_name) {
+    foreach (static::$system->moduleList() as $module_name) {
       $names[] = '\\Drupal\\' . $module_name . '\\TypedEntity\\' . $class_name_entity_type;
     }
 
@@ -147,7 +157,7 @@ class TypedEntityManager implements TypedEntityManagerInterface {
       return $names;
     }
     $class_name_bundle = 'Typed' . static::camelize($entity_type) . static::camelize($bundle);
-    foreach (module_list() as $module_name) {
+    foreach (static::$system->moduleList() as $module_name) {
       $names[] = '\\Drupal\\' . $module_name . '\\TypedEntity\\' . $class_name_bundle;
     }
 
