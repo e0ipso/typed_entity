@@ -89,7 +89,7 @@ class TypedEntityManager implements TypedEntityManagerInterface {
    *   An array of class name candidates.
    */
   protected static function getClassNameCandidates($entity_type, $bundle = NULL) {
-    $candidates = module_invoke_all('typed_entity_registry_info');
+    $candidates = static::$system->moduleInvokeAll('typed_entity_registry_info');
     $candidate_entity_type = $candidate_bundle = '';
     foreach ($candidates as $candidate) {
       if ($candidate['entity_type'] != $entity_type) {

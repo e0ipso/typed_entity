@@ -7,10 +7,7 @@
 
 namespace Drupal\typed_entity_example\Tests;
 
-use Drupal\typed_entity\TypedEntity\TypedEntity;
 use Drupal\typed_entity\TypedEntity\TypedEntityManager;
-use Drupal\typed_entity_example\TypedEntity\Node\Article;
-use Drupal\typed_entity_example\TypedEntity\TypedNode;
 
 class TypedEntityExampleWebTestCase extends \DrupalWebTestCase {
 
