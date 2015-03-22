@@ -7,11 +7,11 @@
 
 namespace Drupal\typed_entity\Tests;
 
+use Drupal\typed_entity\Entity\MockEntityWrapperService;
 use Drupal\typed_entity\Exception\TypedEntityException;
 use Drupal\typed_entity\TypedEntity\Tests\TypedEntityModules;
 use Drupal\typed_entity\TypedEntity\TypedEntity;
 use Drupal\typed_entity\TypedEntity\TypedEntityManager;
-use Drupal\xautoload\Tests\Example\ExampleModules;
 use Drupal\xautoload\Tests\Mock\MockDrupalSystem;
 use Drupal\xautoload\Tests\VirtualDrupal\DrupalComponentContainer;
 

@@ -33,45 +33,89 @@ class MockEntityDrupalWrapper implements MockEntityDrupalWrapperInterface {
   protected $entity;
 
   /**
+   * Entity keys. Like the ones provided by entity_get_info().
+   *
+   * @var object
+   */
+  protected $entityKeys;
+
+  /**
    * Constructs a MockEntityDrupalWrapper.
    *
-   * @param string $entity_type
-   *   The entity type.
-   * @param string $bundle
-   *   The bundle.
-   * @param string $fixture
-   *   The object to set.
+   * @param $type
+   *   The type of the passed data.
+   * @param $data
+   *   Optional. The entity to wrap or its identifier.
+   * @param $info
+   *   Optional. Used internally to pass info about properties down the tree.
    */
-  public function __construct($entity_type, $bundle = NULL, $fixture = NULL) {
-    $this->entityType = $entity_type;
-    $this->bundle = $bundle;
-    $this->entity = $fixture;
+  public function __construct($type, $data = NULL, $info = array()) {
+    $this->entityType = $type;
+    // When using this class for unit testing, set the fixture class in the
+    // service container.
+    $fixture_path = xautoload()
+      ->getServiceContainer()
+      ->get('entity_wrapper_fixture_path');
+    if (empty($fixture_path)) {
+      throw new TypedEntityException('You need to set the fixture path in the service container to mock an entity.');
+    }
+    $this->loadFixture($fixture_path);
   }
 
   /**
    * Load a fixture from a file with a serialized entity.
    *
-   * @param string $fixture_path
-   *   The path to the file containing the serialized version of the entity. Or
-   *   the object itself.
+   * @param string|array $fixture
+   *   The fixture array or the path of a file containing a serialized fixture.
    *
    * @throws TypedEntityException
    */
-  public function loadFixture($fixture_path) {
-    if (!file_exists($fixture_path)) {
-      throw new TypedEntityException('The provided fixture file does not exist.');
+  public function loadFixture($fixture) {
+    if (!is_array($fixture)) {
+      if (!file_exists($fixture)) {
+        throw new TypedEntityException('The provided fixture file does not exist.');
+      }
+      if (!$fixture = unserialize(file_get_contents($fixture))) {
+        throw new TypedEntityException('The contents of the fixture is not valid.');
+      }
     }
-    if (!$this->entity = (object) unserialize(file_get_contents($fixture_path))) {
-      throw new TypedEntityException('The contents of the fixture is not valid.');
-    }
+    $this->initFixture($fixture);
+  }
+
+  /**
+   * Generates a fixture for easier mocking.
+   *
+   * This function needs to be run in a context with drupal bootstrap.
+   *
+   * @param string $entity_type
+   *   The entity type.
+   * @param mixed $entity
+   *   Either a loaded entity or its ID.
+   *
+   * @return string
+   *   The serialized fixture array.
+   */
+  public static function generateFixture($entity_type, $entity) {
+    $wrapper = new \EntityDrupalWrapper($entity_type, $entity);
+    $entity_info = entity_get_info($wrapper->type());
+    $fixture = array(
+      'bundle' => $wrapper->getBundle(),
+      'entity keys' => $entity_info['entity keys'],
+      'entity' => $wrapper->value(),
+    );
+
+    return serialize($fixture);
   }
 
   /**
    * {@inheritdoc}
    */
   public function info() {
-    $entity_array = (array) $this->entity;
-    return array_keys($entity_array);
+    return array(
+      'langcode' => $this->entity->{$this->entityKeys['language']},
+      'type' => $this->entityType,
+      'property defaults' => array(),
+    );
   }
 
   /**
@@ -233,6 +277,18 @@ class MockEntityDrupalWrapper implements MockEntityDrupalWrapperInterface {
    */
   public function __get($name) {
     return $this->get($name);
+  }
+
+  /**
+   * Takes a fixture and initializes the class properties.
+   *
+   * @param array $fixture
+   */
+  protected function initFixture(array $fixture) {
+    $this->entityKeys = $fixture['entity keys'];
+    $this->entityType = $fixture['type'];
+    $this->bundle = $fixture['bundle'];
+    $this->entity = $fixture['entity'];
   }
 
 }
