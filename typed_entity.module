@@ -4,3 +4,12 @@
  * @file
  * Module implementation file.
  */
+
+use Drupal\typed_entity\Entity\EntityWrapperService;
+
+/**
+ * Implements hook_xautoload().
+ */
+function typed_entity_xautoload($adapter) {
+  xautoload()->getServiceContainer()->set('entity_wrapper', new EntityWrapperService());
+}
