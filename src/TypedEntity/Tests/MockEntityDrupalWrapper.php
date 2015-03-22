@@ -104,7 +104,9 @@ class MockEntityDrupalWrapper implements MockEntityDrupalWrapperInterface {
       'entity' => $wrapper->value(),
     );
 
-    return serialize($fixture);
+    $output = serialize($fixture);
+    $output = preg_replace("/[\n\r\t]*/", '', $output);
+    return $output;
   }
 
   /**

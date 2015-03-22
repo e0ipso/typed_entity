@@ -22,7 +22,9 @@ class TypedEntityManager implements TypedEntityManagerInterface {
    * {@inheritdoc}
    */
   public static function create($entity_type, $entity) {
-    static::$system = xautoload()->getServiceContainer()->get('system');
+    static::$system = xautoload()
+      ->getServiceContainer()
+      ->get('system');
     $class_name = static::getClass($entity_type, $entity);
     return new $class_name($entity_type, NULL, $entity);
   }

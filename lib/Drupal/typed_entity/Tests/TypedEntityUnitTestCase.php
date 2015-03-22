@@ -9,9 +9,11 @@ namespace Drupal\typed_entity\Tests;
 
 use Drupal\typed_entity\Entity\MockEntityWrapperService;
 use Drupal\typed_entity\Exception\TypedEntityException;
+use Drupal\typed_entity\TypedEntity\Tests\MockEntityDrupalWrapper;
 use Drupal\typed_entity\TypedEntity\Tests\TypedEntityModules;
 use Drupal\typed_entity\TypedEntity\TypedEntity;
 use Drupal\typed_entity\TypedEntity\TypedEntityManager;
+use Drupal\typed_entity_example\TypedEntity\Node\Article;
 use Drupal\xautoload\Tests\Mock\MockDrupalSystem;
 use Drupal\xautoload\Tests\VirtualDrupal\DrupalComponentContainer;
 
@@ -70,9 +72,25 @@ class TypedEntityUnitTestCase extends \DrupalUnitTestCase {
    */
   public function testTypedEntityManager() {
     // Test the discovery.
-    $entity = $this->loadFixture(__DIR__ . '/fixtures/article.inc');
-    $manager = TypedEntityManager::create('node', $entity);
 
+    // When creating the EMW the entity in the fixture will be used regardless
+    // of the passed in entity.
+    xautoload()
+      ->getServiceContainer()
+      ->set('entity_wrapper_fixture_path', __DIR__ . '/fixtures/article.inc');
+
+    $typed_article = TypedEntityManager::create('node', NULL);
+    $this->assertTrue($typed_article instanceof Article);
+    $this->assertEqual('node', $typed_article->getEntityType());
+    $this->assertEqual('article', $typed_article->getBundle());
+    $this->assertTrue($typed_article->access('edit'));
+    $this->assertTrue($typed_article->getWrapper() instanceof MockEntityDrupalWrapper);
+    $random_name = $this->randomName();
+    $random_value = $this->randomString();
+    $typed_article->{$random_name} = $random_value;
+    $typed_article->save();
+    $entity = $typed_article->getEntity();
+    $this->assertEqual($entity->{$random_name}, $random_value);
   }
 
   /**
@@ -87,10 +105,14 @@ class TypedEntityUnitTestCase extends \DrupalUnitTestCase {
     $example_modules = new TypedEntityModules();
     $components = new DrupalComponentContainer($example_modules);
     $system = new MockDrupalSystem($components);
-    xautoload()->getServiceContainer()->set('system', $system);
+    xautoload()
+      ->getServiceContainer()
+      ->set('system', $system);
 
     $entity_wrapper = new MockEntityWrapperService();
-    xautoload()->getServiceContainer()->set('entity_wrapper', $entity_wrapper);
+    xautoload()
+      ->getServiceContainer()
+      ->set('entity_wrapper', $entity_wrapper);
   }
 
   /**
