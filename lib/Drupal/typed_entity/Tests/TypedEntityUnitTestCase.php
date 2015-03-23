@@ -75,10 +75,8 @@ class TypedEntityUnitTestCase extends \DrupalUnitTestCase {
 
     // When creating the EMW the entity in the fixture will be used regardless
     // of the passed in entity.
-    xautoload()
-      ->getServiceContainer()
-      ->set('entity_wrapper_fixture_path', __DIR__ . '/fixtures/article.inc');
     $wrapper_service = new MockEntityWrapperService();
+    $wrapper_service->setFixturePath(__DIR__ . '/fixtures/article.inc');
     xautoload()
       ->getServiceContainer()
       ->set('entity_wrapper', $wrapper_service);
@@ -99,23 +97,6 @@ class TypedEntityUnitTestCase extends \DrupalUnitTestCase {
     $typed_article->save();
     $entity = $typed_article->getEntity();
     $this->assertEqual($entity->{$random_name}, $random_value);
-  }
-
-  /**
-   * Helper function to set up the mocked Drupal instance.
-   */
-  protected function setUpMockDrupalSystem() {
-    // Set up the system with the following modules enabled:
-    //   - system
-    //   - xautoload
-    //   - typed_entity
-    //   - typed_entity_example
-    $example_modules = new TypedEntityModules();
-    $components = new DrupalComponentContainer($example_modules);
-    $system = new MockDrupalSystem($components);
-    xautoload()
-      ->getServiceContainer()
-      ->set('system', $system);
   }
 
   /**

@@ -9,7 +9,9 @@ namespace Drupal\typed_entity\TypedEntity\Tests;
 
 use Drupal\typed_entity\Exception\TypedEntityException;
 
-class MockEntityDrupalWrapper implements MockEntityDrupalWrapperInterface {
+// @TODO: Fix this. If we use EntityDrupalWrapperInterface then we need Drupal's registry, therefore the DB, …
+// class MockEntityDrupalWrapper implements \EntityDrupalWrapperInterface {
+class MockEntityDrupalWrapper {
 
   /**
    * Entity type.
@@ -46,37 +48,13 @@ class MockEntityDrupalWrapper implements MockEntityDrupalWrapperInterface {
     $this->entityType = $type;
     // When using this class for unit testing, set the fixture class in the
     // service container.
-    $fixture_path = xautoload()
+    /** @var MockEntityWrapperServiceInterface $mock_service */
+    $mock_service = xautoload()
       ->getServiceContainer()
-      ->get('entity_wrapper_fixture_path');
-    if (empty($fixture_path)) {
-      throw new TypedEntityException('You need to set the fixture path in the service container to mock an entity.');
-    }
-    $this->loadFixture($fixture_path);
+      ->get('entity_wrapper');
+    $this->initFixture($mock_service->getFixture());
   }
 
-  /**
-   * Load a fixture from a file with a serialized entity.
-   *
-   * @param string|array $fixture
-   *   The fixture array or the path of a file containing a serialized fixture.
-   *
-   * @throws TypedEntityException
-   */
-  public function loadFixture($fixture) {
-    if (!is_array($fixture)) {
-      $fixture_path = $fixture;
-      $fixture = NULL;
-      if (!file_exists($fixture_path)) {
-        throw new TypedEntityException('The provided fixture file does not exist.');
-      }
-      require $fixture_path;
-      if (empty($fixture)) {
-        throw new TypedEntityException('The contents of the fixture is not valid.');
-      }
-    }
-    $this->initFixture($fixture);
-  }
 
   /**
    * Generates a fixture for easier mocking.
