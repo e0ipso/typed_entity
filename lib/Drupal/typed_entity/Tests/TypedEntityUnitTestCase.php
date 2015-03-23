@@ -95,21 +95,4 @@ class TypedEntityUnitTestCase extends \DrupalUnitTestCase {
     $this->assertEqual($entity->{$random_name}, $random_value);
   }
 
-  /**
-   * Loads a serialized object from a file.
-   *
-   * @param string $path
-   *   The location of the fixture file.
-   *
-   * @return mixed
-   *   The unserialized value.
-   */
-  protected static function loadFixture($path) {
-    if (!file_exists($path)) {
-      return NULL;
-    }
-    $contents = file_get_contents($path);
-    return unserialize($contents);
-  }
-
 }
