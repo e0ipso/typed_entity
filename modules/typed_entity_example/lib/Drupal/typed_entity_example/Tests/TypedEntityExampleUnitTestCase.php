@@ -44,7 +44,7 @@ class TypedEntityExampleUnitTestCase extends \DrupalUnitTestCase {
    * Test logging message.
    */
   public function testLoggingMessage() {
-    $typed_article = new TypedNodeArticleUnitTest('node', 1, NULL, 'article');
+    $typed_article = new TypedNodeArticleUnitTest(xautoload()->getServiceContainer(), 'node', 1, NULL, 'article');
     $this->assertEqual($typed_article->getLoggingMessage(), 'User with id 1. Node with title Foo. Status 1.', 'Logging message is successful.');
   }
 
