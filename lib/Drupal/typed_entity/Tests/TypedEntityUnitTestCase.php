@@ -78,16 +78,21 @@ class TypedEntityUnitTestCase extends \DrupalUnitTestCase {
     xautoload()
       ->getServiceContainer()
       ->set('entity_wrapper_fixture_path', __DIR__ . '/fixtures/article.inc');
+    $wrapper_service = new MockEntityWrapperService();
     xautoload()
       ->getServiceContainer()
-      ->set('entity_wrapper', new MockEntityWrapperService());
+      ->set('entity_wrapper', $wrapper_service);
 
-    $typed_article = TypedEntityManager::create('node', NULL);
+    // Get the mock entity to be loaded.
+    $entity = $wrapper_service->wrap('node', NULL)->value();
+    $typed_article = TypedEntityManager::create('node', $entity);
     $this->assertTrue($typed_article instanceof Article);
     $this->assertEqual('node', $typed_article->getEntityType());
     $this->assertEqual('article', $typed_article->getBundle());
+    $this->assertEqual($entity, $typed_article->getEntity(), 'Correct entity set');
     $this->assertTrue($typed_article->access('edit'));
     $this->assertTrue($typed_article->getWrapper() instanceof MockEntityDrupalWrapper);
+
     $random_name = $this->randomName();
     $random_value = $this->randomString();
     $typed_article->{$random_name} = $random_value;
