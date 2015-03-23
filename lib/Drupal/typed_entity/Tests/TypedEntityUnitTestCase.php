@@ -46,8 +46,9 @@ class TypedEntityUnitTestCase extends \DrupalUnitTestCase {
    * Test logging message.
    */
   public function testConstructor() {
+    $dic = xautoload()->getServiceContainer();
     try {
-      new TypedEntity(NULL, 1);
+      new TypedEntity($dic, NULL, 1);
       $this->fail('Exception was not thrown for missing entity type.');
     }
     catch (TypedEntityException $e) {
@@ -55,7 +56,7 @@ class TypedEntityUnitTestCase extends \DrupalUnitTestCase {
     }
 
     try {
-      new TypedEntity('foo');
+      new TypedEntity($dic, 'foo');
       $this->fail('Exception was not thrown for missing entity and ID.');
     }
     catch (TypedEntityException $e) {
