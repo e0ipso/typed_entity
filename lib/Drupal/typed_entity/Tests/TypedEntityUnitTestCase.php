@@ -10,12 +10,8 @@ namespace Drupal\typed_entity\Tests;
 use Drupal\typed_entity\Exception\TypedEntityException;
 use Drupal\typed_entity\TypedEntity\Tests\MockEntityDrupalWrapper;
 use Drupal\typed_entity\TypedEntity\Tests\MockEntityWrapperService;
-use Drupal\typed_entity\TypedEntity\Tests\TypedEntityModules;
 use Drupal\typed_entity\TypedEntity\TypedEntity;
 use Drupal\typed_entity\TypedEntity\TypedEntityManager;
-use Drupal\typed_entity_example\TypedEntity\Node\Article;
-use Drupal\xautoload\Tests\Mock\MockDrupalSystem;
-use Drupal\xautoload\Tests\VirtualDrupal\DrupalComponentContainer;
 
 class TypedEntityUnitTestCase extends \DrupalUnitTestCase {
 
@@ -84,7 +80,6 @@ class TypedEntityUnitTestCase extends \DrupalUnitTestCase {
     // Get the mock entity to be loaded.
     $entity = $wrapper_service->wrap('node', NULL)->value();
     $typed_article = TypedEntityManager::create('node', $entity);
-    $this->assertTrue($typed_article instanceof Article);
     $this->assertEqual('node', $typed_article->getEntityType());
     $this->assertEqual('article', $typed_article->getBundle());
     $this->assertEqual($entity, $typed_article->getEntity(), 'Correct entity set');

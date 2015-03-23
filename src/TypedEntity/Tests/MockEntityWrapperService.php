@@ -48,6 +48,7 @@ class MockEntityWrapperService implements MockEntityWrapperServiceInterface {
    */
   public function setFixturePath($fixturePath) {
     $this->fixturePath = $fixturePath;
+    $this->fixture = NULL;
   }
 
   /**
