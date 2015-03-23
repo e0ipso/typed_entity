@@ -9,7 +9,9 @@ namespace Drupal\typed_entity\TypedEntity\Tests;
 
 use Drupal\typed_entity\Exception\TypedEntityException;
 
-interface MockEntityDrupalWrapperInterface extends \EntityDrupalWrapperInterface {
+// @TODO: Fix this. If we use EntityDrupalWrapperInterface then we need Drupal's registry, therefore the DB, …
+//interface MockEntityDrupalWrapperInterface extends \EntityDrupalWrapperInterface {
+interface MockEntityDrupalWrapperInterface {
 
   /**
    * Load a fixture from a file with a serialized entity.
