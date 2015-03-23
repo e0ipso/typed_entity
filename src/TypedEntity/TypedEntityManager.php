@@ -7,6 +7,7 @@
 
 namespace Drupal\typed_entity\TypedEntity;
 
+use Drupal\xautoload\DIC\ServiceContainer;
 use Drupal\xautoload\DrupalSystem\DrupalSystemInterface;
 
 class TypedEntityManager implements TypedEntityManagerInterface {
@@ -19,14 +20,31 @@ class TypedEntityManager implements TypedEntityManagerInterface {
   protected static $system;
 
   /**
+   * Drupal system wrapper.
+   *
+   * @var ServiceContainer
+   */
+  protected static $dic;
+
+  /**
+   * Constructor.
+   *
+   * Declare a private constructor to make sure this class is never
+   * instantiated. All method and properties here must be static.
+   */
+  private function __construct() {}
+
+  /**
    * {@inheritdoc}
    */
-  public static function create($entity_type, $entity) {
-    static::$system = xautoload()
-      ->getServiceContainer()
-      ->get('system');
+  public static function create($entity_type, $entity, ServiceContainer $dic = NULL) {
+    if (!isset($dic)) {
+      $dic = xautoload()->getServiceContainer();
+    }
+    static::$dic = $dic;
+    static::$system = $dic->get('system');
     $class_name = static::getClass($entity_type, $entity);
-    return new $class_name($entity_type, NULL, $entity);
+    return new $class_name($dic, $entity_type, NULL, $entity);
   }
 
   /**
@@ -43,8 +61,7 @@ class TypedEntityManager implements TypedEntityManagerInterface {
   public static function getClass($entity_type, $entity) {
     $classes = &drupal_static(__METHOD__);
     /** @var \EntityDrupalWrapperInterface $wrapper */
-    $wrapper = xautoload()
-      ->getServiceContainer()
+    $wrapper = static::$dic
       ->get('entity_wrapper')
       ->wrap($entity_type, $entity);
     $bundle = $wrapper->getBundle();

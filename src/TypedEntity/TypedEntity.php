@@ -8,6 +8,7 @@
 namespace Drupal\typed_entity\TypedEntity;
 
 use Drupal\typed_entity\Exception\TypedEntityException;
+use Drupal\xautoload\DIC\ServiceContainer;
 
 class TypedEntity implements TypedEntityInterface {
 
@@ -47,8 +48,17 @@ class TypedEntity implements TypedEntityInterface {
   protected $wrapper;
 
   /**
+   * The EMW
+   *
+   * @var ServiceContainer
+   */
+  protected $dic;
+
+  /**
    * Constructs a TypedEntity object.
    *
+   * @param ServiceContainer $dic
+   *   The dependency injection container from xautoload.
    * @param string $entity_type
    *   The type of the entity.
    * @param int $entity_id
@@ -61,13 +71,14 @@ class TypedEntity implements TypedEntityInterface {
    * @throws \Drupal\typed_entity\Exception\TypedEntityException
    * @throws \EntityMalformedException
    */
-  public function __construct($entity_type, $entity_id = NULL, $entity = NULL, $bundle = NULL) {
+  public function __construct(ServiceContainer $dic, $entity_type, $entity_id = NULL, $entity = NULL, $bundle = NULL) {
     if (empty($entity_type)) {
       throw new TypedEntityException('You need to provide the entity type for the TypedEntity.');
     }
     if (empty($entity_id) && empty($entity)) {
       throw new TypedEntityException('You need to provide the fully loaded entity or the entity ID.');
     }
+    $this->dic = $dic;
     $this->entityType = $entity_type;
     $this->entityId = $entity_id;
     $this->entity = $entity;
@@ -105,8 +116,8 @@ class TypedEntity implements TypedEntityInterface {
       return NULL;
     }
 
-    $this->entity = xautoload()
-      ->getServiceContainer()
+    $this->entity = $this
+      ->dic
       ->get('entity_wrapper')
       ->wrap($this->getEntityType(), $entity_id)
       ->value();
@@ -141,8 +152,8 @@ class TypedEntity implements TypedEntityInterface {
     if (isset($this->wrapper)) {
       return $this->wrapper;
     }
-    $this->wrapper = xautoload()
-      ->getServiceContainer()
+    $this->wrapper = $this
+      ->dic
       ->get('entity_wrapper')
       ->wrap($this->getEntityType(), $this->getEntity());
     return $this->wrapper;

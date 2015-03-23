@@ -7,8 +7,6 @@
 
 namespace Drupal\typed_entity\TypedEntity\Tests;
 
-use Drupal\typed_entity\Exception\TypedEntityException;
-
 // @TODO: Fix this. If we use EntityDrupalWrapperInterface then we need Drupal's registry, therefore the DB, …
 // class MockEntityDrupalWrapper implements \EntityDrupalWrapperInterface {
 class MockEntityDrupalWrapper {
