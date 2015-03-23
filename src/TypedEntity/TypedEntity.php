@@ -48,6 +48,13 @@ class TypedEntity implements TypedEntityInterface {
   protected $wrapper;
 
   /**
+   * The EMW
+   *
+   * @var ServiceContainer
+   */
+  protected $dic;
+
+  /**
    * Constructs a TypedEntity object.
    *
    * @param ServiceContainer $dic
