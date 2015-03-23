@@ -41,13 +41,6 @@ class MockEntityDrupalWrapper implements MockEntityDrupalWrapperInterface {
 
   /**
    * Constructs a MockEntityDrupalWrapper.
-   *
-   * @param $type
-   *   The type of the passed data.
-   * @param $data
-   *   Optional. The entity to wrap or its identifier.
-   * @param $info
-   *   Optional. Used internally to pass info about properties down the tree.
    */
   public function __construct($type, $data = NULL, $info = array()) {
     $this->entityType = $type;
@@ -72,10 +65,13 @@ class MockEntityDrupalWrapper implements MockEntityDrupalWrapperInterface {
    */
   public function loadFixture($fixture) {
     if (!is_array($fixture)) {
-      if (!file_exists($fixture)) {
+      $fixture_path = $fixture;
+      $fixture = NULL;
+      if (!file_exists($fixture_path)) {
         throw new TypedEntityException('The provided fixture file does not exist.');
       }
-      if (!$fixture = unserialize(file_get_contents($fixture))) {
+      require $fixture_path;
+      if (empty($fixture)) {
         throw new TypedEntityException('The contents of the fixture is not valid.');
       }
     }
@@ -104,9 +100,7 @@ class MockEntityDrupalWrapper implements MockEntityDrupalWrapperInterface {
       'entity' => $wrapper->value(),
     );
 
-    $output = serialize($fixture);
-    $output = preg_replace("/[\n\r\t]*/", '', $output);
-    return $output;
+    return var_export($fixture, TRUE);
   }
 
   /**
@@ -220,14 +214,14 @@ class MockEntityDrupalWrapper implements MockEntityDrupalWrapperInterface {
    * {@inheritdoc}
    */
   public function getIdentifier() {
-    return 1;
+    return $this->entity->{$this->entityKeys['id']};
   }
 
   /**
    * {@inheritdoc}
    */
   public function getBundle() {
-    $this->bundle;
+    return $this->bundle;
   }
 
   /**
@@ -265,7 +259,7 @@ class MockEntityDrupalWrapper implements MockEntityDrupalWrapperInterface {
    * {@inheritdoc}
    */
   public function entityKey($name) {
-    return 'id';
+    return $this->entityKeys[$name];
   }
 
   /**
@@ -288,7 +282,6 @@ class MockEntityDrupalWrapper implements MockEntityDrupalWrapperInterface {
    */
   protected function initFixture(array $fixture) {
     $this->entityKeys = $fixture['entity keys'];
-    $this->entityType = $fixture['type'];
     $this->bundle = $fixture['bundle'];
     $this->entity = $fixture['entity'];
   }

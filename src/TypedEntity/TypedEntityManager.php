@@ -42,7 +42,12 @@ class TypedEntityManager implements TypedEntityManagerInterface {
    */
   public static function getClass($entity_type, $entity) {
     $classes = &drupal_static(__METHOD__);
-    list(,, $bundle) = entity_extract_ids($entity_type, $entity);
+    /** @var \EntityDrupalWrapperInterface $wrapper */
+    $wrapper = xautoload()
+      ->getServiceContainer()
+      ->get('entity_wrapper')
+      ->wrap($entity_type, $entity);
+    $bundle = $wrapper->getBundle();
     $cid = $entity_type . ':' . $bundle;
 
     if (isset($classes[$cid])) {
@@ -50,7 +55,7 @@ class TypedEntityManager implements TypedEntityManagerInterface {
     }
 
     $cached_classes = array();
-    if ($cache = cache_get('typed_entity_classes', 'cache_bootstrap')) {
+    if ($cache = static::$system->cacheGet('typed_entity_classes', 'cache_bootstrap')) {
       $cached_classes = $cache->data;
     }
 
@@ -69,7 +74,7 @@ class TypedEntityManager implements TypedEntityManagerInterface {
         break;
       }
     }
-    cache_set('typed_entity_classes', $classes, 'cache_bootstrap');
+    static::$system->cacheSet('typed_entity_classes', $classes, 'cache_bootstrap');
 
     return $classes[$cid];
   }

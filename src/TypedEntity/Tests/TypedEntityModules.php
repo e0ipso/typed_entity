@@ -18,6 +18,7 @@ class TypedEntityModules extends AbstractExampleModules {
     return array_fill_keys(array(
         'system',
         'xautoload',
+        'entity',
         'typed_entity',
         'typed_entity_example',
       ), 'module');
@@ -46,6 +47,9 @@ class TypedEntityModules extends AbstractExampleModules {
         '\\Drupal\\typed_entity_example\\TypedEntity\\Tests\\TypedNodeArticleUnitTest',
         '\\Drupal\\typed_entity_example\\Tests\\TypedEntityExampleUnitTestCase',
         '\\Drupal\\typed_entity_example\\Tests\\TypedEntityExampleWebTestCase',
+      ),
+      'entity' => array(
+        '\\EntityDrupalWrapperInterface',
       ),
     );
   }

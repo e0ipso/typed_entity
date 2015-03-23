@@ -2,12 +2,12 @@
 
 /**
  * @file
- * Contains \Drupal\typed_entity\Entity\MockEntityWrapperService.
+ * Contains \Drupal\typed_entity\TypedEntity\Tests\MockEntityWrapperService.
  */
 
-namespace Drupal\typed_entity\Entity;
+namespace Drupal\typed_entity\TypedEntity\Tests;
 
-use Drupal\typed_entity\TypedEntity\Tests\MockEntityDrupalWrapper;
+use Drupal\typed_entity\Entity\EntityWrapperServiceInterface;
 
 class MockEntityWrapperService implements EntityWrapperServiceInterface {
 

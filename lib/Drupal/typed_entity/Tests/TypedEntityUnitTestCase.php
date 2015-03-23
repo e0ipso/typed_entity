@@ -7,9 +7,9 @@
 
 namespace Drupal\typed_entity\Tests;
 
-use Drupal\typed_entity\Entity\MockEntityWrapperService;
 use Drupal\typed_entity\Exception\TypedEntityException;
 use Drupal\typed_entity\TypedEntity\Tests\MockEntityDrupalWrapper;
+use Drupal\typed_entity\TypedEntity\Tests\MockEntityWrapperService;
 use Drupal\typed_entity\TypedEntity\Tests\TypedEntityModules;
 use Drupal\typed_entity\TypedEntity\TypedEntity;
 use Drupal\typed_entity\TypedEntity\TypedEntityManager;
@@ -78,6 +78,9 @@ class TypedEntityUnitTestCase extends \DrupalUnitTestCase {
     xautoload()
       ->getServiceContainer()
       ->set('entity_wrapper_fixture_path', __DIR__ . '/fixtures/article.inc');
+    xautoload()
+      ->getServiceContainer()
+      ->set('entity_wrapper', new MockEntityWrapperService());
 
     $typed_article = TypedEntityManager::create('node', NULL);
     $this->assertTrue($typed_article instanceof Article);
@@ -108,11 +111,6 @@ class TypedEntityUnitTestCase extends \DrupalUnitTestCase {
     xautoload()
       ->getServiceContainer()
       ->set('system', $system);
-
-    $entity_wrapper = new MockEntityWrapperService();
-    xautoload()
-      ->getServiceContainer()
-      ->set('entity_wrapper', $entity_wrapper);
   }
 
   /**
