@@ -61,8 +61,21 @@ script:
   - cd $TRAVIS_BUILD_DIR/../drupal
 
   # Download and enable module and its dependencies
-  - drush --yes dl xautoload
+  - drush --yes dl entity --dev
+  - drush --yes dl xautoload-7.x-5.x
   - drush --yes dl file_entity
+
+  # Patch xautoload to add module invoke wrapping.
+  - cd sites/all/modules/xautoload
+  - curl -LO https://www.drupal.org/files/issues/2456877-module-invoke-wrapping-1.patch
+  - patch -p1 < 2456877-module-invoke-wrapping-1.patch
+  - cd $TRAVIS_BUILD_DIR/../drupal
+
+  # Patch entity to add module invoke wrapping.
+  - cd sites/all/modules/entity
+  - curl -LO https://www.drupal.org/files/issues/2455851-add-additional-interfaces-1.patch
+  - patch -p1 < 2455851-add-additional-interfaces-1.patch
+  - cd $TRAVIS_BUILD_DIR/../drupal
 
   # Enable the modules
   - drush --yes pm-enable simpletest typed_entity typed_entity_example

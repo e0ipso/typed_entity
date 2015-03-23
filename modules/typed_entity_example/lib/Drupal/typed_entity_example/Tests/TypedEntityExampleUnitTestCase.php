@@ -7,6 +7,7 @@
 
 namespace Drupal\typed_entity_example\Tests;
 
+use Drupal\typed_entity\TypedEntity\Tests\MockEntityWrapperService;
 use Drupal\typed_entity\TypedEntity\TypedEntityManager;
 use Drupal\typed_entity_example\TypedEntity\Tests\TypedNodeArticleUnitTest;
 
@@ -56,4 +57,53 @@ class TypedEntityExampleUnitTestCase extends \DrupalUnitTestCase {
     $this->assertEqual(TypedEntityManager::camelize('1-a>234'), '1A>234');
     $this->assertEqual(TypedEntityManager::camelize(''), '');
   }
+
+  /**
+   * Test factory.
+   */
+  public function testFactory() {
+    $wrapper_service = new MockEntityWrapperService();
+    $wrapper_service->setFixturePath(__DIR__ . '/fixtures/article.inc');
+    xautoload()
+      ->getServiceContainer()
+      ->set('entity_wrapper', $wrapper_service);
+
+    // Get the mock entity to be loaded.
+    $entity = $wrapper_service->wrap('node', NULL)->value();
+    $typed_article = TypedEntityManager::create('node', $entity);
+    $reflection_article = new \ReflectionClass($typed_article);
+    if ($reflection_article->name == 'Drupal\typed_entity_example\TypedEntity\Node\Article') {
+      $this->pass('The hook_typed_entity_registry_info is taking precedence.');
+    }
+    else {
+      $this->fail('The hook_typed_entity_registry_info is not taking precedence.');
+    }
+
+    $wrapper_service->setFixturePath(__DIR__ . '/fixtures/page.inc');
+    // Get the mock entity to be loaded.
+    $entity = $wrapper_service->wrap('node', NULL)->value();
+    $typed_page = TypedEntityManager::create('node', $entity);
+
+    $reflection_page = new \ReflectionClass($typed_page);
+    if ($reflection_page->name == 'Drupal\typed_entity_example\TypedEntity\TypedNode') {
+      $this->pass('The factory is falling back to TypedNode.');
+    }
+    else {
+      $this->fail('The factory is not falling back to TypedNode.');
+    }
+
+    // Test the fallback to TypedEntity.
+    $wrapper_service->setFixturePath(__DIR__ . '/fixtures/page.inc');
+    // Get the mock entity to be loaded.
+    $entity = $wrapper_service->wrap('node', NULL)->value();
+    $typed_user = TypedEntityManager::create('user', $entity);
+    $reflection_user = new \ReflectionClass($typed_user);
+    if ($reflection_user->name == 'Drupal\typed_entity\TypedEntity\TypedEntity') {
+      $this->pass('The factory is falling back to TypedEntity.');
+    }
+    else {
+      $this->fail('The factory is not falling back to TypedEntity.');
+    }
+  }
+
 }

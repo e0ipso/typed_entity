@@ -85,9 +85,9 @@ class TypedEntity implements TypedEntityInterface {
       // This means that somehow we do not have neither entity nor entity ID.
       throw new TypedEntityException('You need to provide the fully loaded entity or the entity ID.');
     }
-    list($entity_id, , $bundle) = entity_extract_ids($this->getEntityType(), $this->entity);
-    $this->entityId = $entity_id;
-    $this->bundle = $bundle;
+    $this->entityId = $this
+      ->getWrapper()
+      ->getIdentifier();
 
     return $this->entityId;
   }
@@ -104,8 +104,12 @@ class TypedEntity implements TypedEntityInterface {
       // We do not have neither entity nor ID. We cannot load.
       return NULL;
     }
-    $entities = entity_load($this->getEntityType(), array($this->getEntityId()));
-    $this->entity = isset($entities[$this->getEntityId()]) ? $entities[$this->getEntityId()] : NULL;
+
+    $this->entity = xautoload()
+      ->getServiceContainer()
+      ->get('entity_wrapper')
+      ->wrap($this->getEntityType(), $entity_id)
+      ->value();
     return $this->entity;
   }
 
@@ -124,9 +128,9 @@ class TypedEntity implements TypedEntityInterface {
       return $this->bundle;
     }
 
-    list($entity_id, , $bundle) = entity_extract_ids($this->getEntityType(), $this->getEntity());
-    $this->entityId = $entity_id;
-    $this->bundle = $bundle;
+    $this->bundle = $this
+      ->getWrapper()
+      ->getBundle();
     return $this->bundle;
   }
 
@@ -137,7 +141,10 @@ class TypedEntity implements TypedEntityInterface {
     if (isset($this->wrapper)) {
       return $this->wrapper;
     }
-    $this->wrapper = entity_metadata_wrapper($this->getEntityType(), $this->getEntity());
+    $this->wrapper = xautoload()
+      ->getServiceContainer()
+      ->get('entity_wrapper')
+      ->wrap($this->getEntityType(), $this->getEntity());
     return $this->wrapper;
   }
 

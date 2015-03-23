@@ -158,3 +158,12 @@ Care to add **tests**? You can even have unit testing on your custom business lo
 (make sure those computations on the aspect ratio return the expected values).
 
 Check out the [unit test example](modules/typed_entity_example/lib/Drupal/typed_entity_example/Tests/TypedEntityExampleUnitTestCase.php).
+
+## Installation
+This module uses unit testing as an example of how you should test your custom business logic. Sometimes your custom
+logic contains calls to the drupal api that is not loaded for unit testing. To work around that you can use X Autoload
+mock classes.
+
+This module needs an extra patch to do this, so you will have to patch:
+  - `xautoload` with: https://www.drupal.org/files/issues/2456877-module-invoke-wrapping-1.patch
+  - `entity` with: https://www.drupal.org/files/issues/2455851-add-additional-interfaces-1.patch
