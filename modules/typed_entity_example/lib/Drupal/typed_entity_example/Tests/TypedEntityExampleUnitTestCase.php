@@ -93,9 +93,9 @@ class TypedEntityExampleUnitTestCase extends \DrupalUnitTestCase {
     }
 
     // Test the fallback to TypedEntity.
-    $wrapper_service->setFixturePath(__DIR__ . '/fixtures/page.inc');
+    $wrapper_service->setFixturePath(__DIR__ . '/fixtures/user.inc');
     // Get the mock entity to be loaded.
-    $entity = $wrapper_service->wrap('node', NULL)->value();
+    $entity = $wrapper_service->wrap('user', NULL)->value();
     $typed_user = TypedEntityManager::create('user', $entity);
     $reflection_user = new \ReflectionClass($typed_user);
     if ($reflection_user->name == 'Drupal\typed_entity\TypedEntity\TypedEntity') {

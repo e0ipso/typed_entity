@@ -32,7 +32,7 @@ class Article extends TypedNode implements ArticleInterface {
     }
     $item = reset($items);
     $file_id = $item['fid'];
-    return TypedEntityManager::create('user', entity_load_single('file', $file_id));
+    return TypedEntityManager::create('file', entity_load_single('file', $file_id));
   }
 
   /**

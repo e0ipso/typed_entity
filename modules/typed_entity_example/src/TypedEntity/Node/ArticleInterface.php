@@ -13,10 +13,10 @@ use Drupal\typed_entity_example\TypedEntity\TypedNodeInterface;
 interface ArticleInterface extends TypedNodeInterface {
 
   /**
-   * Gets the author of the node.
+   * Gets the image of the node.
    *
    * @return TypedEntityInterface
-   *   The fully loaded user object.
+   *   The fully loaded image object.
    */
   public function getImage();
 
