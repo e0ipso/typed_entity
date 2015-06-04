@@ -165,7 +165,8 @@ class TypedEntity implements TypedEntityInterface {
    *   The property value.
    */
   public function __get($property_name) {
-    return $this->getEntity()->{$property_name};
+    $entity = $this->getEntity();
+    return empty($entity->{$property_name}) ? NULL : $entity->{$property_name};
   }
 
   /**
