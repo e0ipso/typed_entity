@@ -166,7 +166,7 @@ class TypedEntity implements TypedEntityInterface {
    */
   public function __get($property_name) {
     $entity = $this->getEntity();
-    return empty($entity->{$property_name}) ? NULL : $entity->{$property_name};
+    return isset($entity->{$property_name}) ? $entity->{$property_name} : NULL;
   }
 
   /**
