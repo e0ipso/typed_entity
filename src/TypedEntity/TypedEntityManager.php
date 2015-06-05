@@ -7,44 +7,14 @@
 
 namespace Drupal\typed_entity\TypedEntity;
 
-use Drupal\xautoload\DIC\ServiceContainer;
-use Drupal\xautoload\DrupalSystem\DrupalSystemInterface;
-
 class TypedEntityManager implements TypedEntityManagerInterface {
-
-  /**
-   * Drupal system wrapper.
-   *
-   * @var DrupalSystemInterface
-   */
-  protected static $system;
-
-  /**
-   * Drupal system wrapper.
-   *
-   * @var ServiceContainer
-   */
-  protected static $dic;
-
-  /**
-   * Constructor.
-   *
-   * Declare a private constructor to make sure this class is never
-   * instantiated. All method and properties here must be static.
-   */
-  private function __construct() {}
 
   /**
    * {@inheritdoc}
    */
-  public static function create($entity_type, $entity, ServiceContainer $dic = NULL) {
-    if (!isset($dic)) {
-      $dic = xautoload()->getServiceContainer();
-    }
-    static::$dic = $dic;
-    static::$system = $dic->get('system');
+  public static function create($entity_type, $entity) {
     $class_name = static::getClass($entity_type, $entity);
-    return new $class_name($dic, $entity_type, NULL, $entity);
+    return new $class_name($entity_type, NULL, $entity);
   }
 
   /**
@@ -60,11 +30,7 @@ class TypedEntityManager implements TypedEntityManagerInterface {
    */
   public static function getClass($entity_type, $entity) {
     $classes = &drupal_static(__METHOD__);
-    /** @var \EntityDrupalWrapperInterface $wrapper */
-    $wrapper = static::$dic
-      ->get('entity_wrapper')
-      ->wrap($entity_type, $entity);
-    $bundle = $wrapper->getBundle();
+    list(,, $bundle) = entity_extract_ids($entity_type, $entity);
     $cid = $entity_type . ':' . $bundle;
 
     if (isset($classes[$cid])) {
@@ -72,7 +38,7 @@ class TypedEntityManager implements TypedEntityManagerInterface {
     }
 
     $cached_classes = array();
-    if ($cache = static::$system->cacheGet('typed_entity_classes', 'cache_bootstrap')) {
+    if ($cache = cache_get('typed_entity_classes', 'cache_bootstrap')) {
       $cached_classes = $cache->data;
     }
 
@@ -91,7 +57,7 @@ class TypedEntityManager implements TypedEntityManagerInterface {
         break;
       }
     }
-    static::$system->cacheSet('typed_entity_classes', $classes, 'cache_bootstrap');
+    cache_set('typed_entity_classes', $classes, 'cache_bootstrap');
 
     return $classes[$cid];
   }
@@ -113,7 +79,7 @@ class TypedEntityManager implements TypedEntityManagerInterface {
    *   An array of class name candidates.
    */
   protected static function getClassNameCandidates($entity_type, $bundle = NULL) {
-    $candidates = static::$system->moduleInvokeAll('typed_entity_registry_info');
+    $candidates = module_invoke_all('typed_entity_registry_info');
     $candidate_entity_type = $candidate_bundle = '';
     foreach ($candidates as $candidate) {
       if ($candidate['entity_type'] != $entity_type) {
@@ -156,7 +122,7 @@ class TypedEntityManager implements TypedEntityManagerInterface {
   protected static function getClassNameCandidatesEntity($entity_type) {
     $names = array();
     $class_name_entity_type = 'Typed' . static::camelize($entity_type);
-    foreach (static::$system->moduleList() as $module_name) {
+    foreach (module_list() as $module_name) {
       $names[] = '\\Drupal\\' . $module_name . '\\TypedEntity\\' . $class_name_entity_type;
     }
 
@@ -181,7 +147,7 @@ class TypedEntityManager implements TypedEntityManagerInterface {
       return $names;
     }
     $class_name_bundle = 'Typed' . static::camelize($entity_type) . static::camelize($bundle);
-    foreach (static::$system->moduleList() as $module_name) {
+    foreach (module_list() as $module_name) {
       $names[] = '\\Drupal\\' . $module_name . '\\TypedEntity\\' . $class_name_bundle;
     }
 
