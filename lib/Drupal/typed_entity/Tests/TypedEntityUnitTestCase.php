@@ -30,6 +30,8 @@ class TypedEntityUnitTestCase extends \DrupalUnitTestCase {
    * Test logging message.
    */
   public function testConstructor() {
+    require_once __DIR__ . '/../../../../src/TypedEntity/TypedEntity.php';
+    require_once __DIR__ . '/../../../../src/Exception/TypedEntityException.php';
     try {
       new TypedEntity(NULL, 1);
       $this->fail('Exception was not thrown for missing entity type.');

@@ -30,6 +30,7 @@ class TypedEntityExampleUnitTestCase extends \DrupalUnitTestCase {
    * Test logging message.
    */
   public function testLoggingMessage() {
+    require_once __DIR__ . '/../../../../src/TypedEntity/Tests/TypedNodeArticleUnitTest.php';
     $typed_article = new TypedNodeArticleUnitTest('node', 1, NULL, 'article');
     $this->assertEqual($typed_article->getLoggingMessage(), 'User with id 1. Node with title Foo. Status 1.', 'Logging message is successful.');
   }
@@ -38,6 +39,7 @@ class TypedEntityExampleUnitTestCase extends \DrupalUnitTestCase {
    * Test camelize method.
    */
   public function testCamelize() {
+    require_once __DIR__ . '/../../../../../../src/TypedEntity/TypedEntityManager.php';
     $this->assertEqual(TypedEntityManager::camelize('abc_def-ghi'), 'AbcDefGhi');
     $this->assertEqual(TypedEntityManager::camelize('1234'), '1234');
     $this->assertEqual(TypedEntityManager::camelize('1-a>234'), '1A>234');
