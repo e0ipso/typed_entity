@@ -61,7 +61,7 @@ script:
   - cd $TRAVIS_BUILD_DIR/../drupal
 
   # Download and enable module and its dependencies
-  - drush --yes dl registry_autoload
+  - drush --yes pm-enable registry_autoload
   - drush --yes dl file_entity
 
   # Enable the modules
