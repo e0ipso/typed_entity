@@ -62,6 +62,7 @@ script:
 
   # Download and enable module and its dependencies
   - drush --yes pm-enable registry_autoload
+  - drush --yes pm-enable service_container
   - drush --yes dl file_entity
 
   # Enable the modules
