@@ -65,6 +65,12 @@ script:
   - drush --yes pm-enable service_container
   - drush --yes dl file_entity
 
+  # Patch entity to add module additional interfaces.
+  - cd sites/all/modules/entity
+  - curl -LO https://www.drupal.org/files/issues/2455851-add-additional-interfaces-1.patch
+  - patch -p1 < 2455851-add-additional-interfaces-1.patch
+  - cd $TRAVIS_BUILD_DIR/../drupal
+
   # Enable the modules
   - drush --yes pm-enable simpletest typed_entity typed_entity_example
 
