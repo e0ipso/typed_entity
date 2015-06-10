@@ -79,4 +79,17 @@ class TypedEntityExampleWebTestCase extends \DrupalWebTestCase {
     }
   }
 
+  /**
+   * Test the service container integration.
+   */
+  public function testServiceContainer() {
+    $article = $this->drupalCreateNode(array(
+      'type' => 'article',
+      'title' => 'Test article',
+    ));
+    $typed_article = TypedEntityManager::create('node', $article);
+    $wrapper = $typed_article->getWrapper();
+    $this->assertTrue($wrapper instanceof \EntityDrupalWrapperInterface);
+  }
+
 }

@@ -4,3 +4,23 @@
  * @file
  * Module implementation file.
  */
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ *
+ * We need to implement this so the service container plugins can be discovered.
+ *
+ * @todo: Explain what a service container plugin does.
+ *
+ * @param string $owner
+ * @param string $plugin_type
+ *
+ * @return null|string
+ */
+function typed_entity_ctools_plugin_directory($owner, $plugin_type) {
+  if ($owner == 'service_container') {
+    return 'src/ServiceContainer/' . $plugin_type;
+  }
+
+  return NULL;
+}

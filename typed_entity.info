@@ -2,6 +2,7 @@ name = Typed Entity
 description = Provides classes based on the existing entities.
 dependencies[] = entity
 dependencies[] = registry_autoload
+dependencies[] = service_container
 core = 7.x
 
 registry_autoload[] = PSR-4
