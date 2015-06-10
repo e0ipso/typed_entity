@@ -29,7 +29,7 @@ class TypedEntityUnitTestCase extends \DrupalUnitTestCase {
   /**
    * Test logging message.
    */
-  public function testConstructor() {
+  public function __testConstructor() {
     require_once __DIR__ . '/../../../../src/TypedEntity/TypedEntity.php';
     require_once __DIR__ . '/../../../../src/Exception/TypedEntityException.php';
     try {
