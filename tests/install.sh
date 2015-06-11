@@ -7,4 +7,4 @@ set -e
 DIR=$(dirname $0)
 cd $DIR
 composer self-update
-composer install --no-interaction --prefer-source --dev
+composer install --no-interaction --prefer-source
