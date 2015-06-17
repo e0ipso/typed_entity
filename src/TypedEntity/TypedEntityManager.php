@@ -7,14 +7,27 @@
 
 namespace Drupal\typed_entity\TypedEntity;
 
+use Drupal\service_container\DependencyInjection\ContainerInterface;
+
 class TypedEntityManager implements TypedEntityManagerInterface {
+
+  /**
+   * The service container.
+   *
+   * @var ContainerInterface
+   */
+  protected static $serviceContainer;
 
   /**
    * {@inheritdoc}
    */
   public static function create($entity_type, $entity) {
+    // Get the services from the container.
+    if (!isset(static::$serviceContainer)) {
+      static::$serviceContainer = \ServiceContainer::service('service_container');
+    }
     $class_name = static::getClass($entity_type, $entity);
-    return new $class_name($entity_type, NULL, $entity);
+    return new $class_name(static::$serviceContainer->get('entity.manager'), static::$serviceContainer->get('entity.wrapper'), static::$serviceContainer->get('module_handler'), $entity_type, NULL, $entity);
   }
 
   /**
@@ -29,8 +42,10 @@ class TypedEntityManager implements TypedEntityManagerInterface {
    *   A valid class name if one exists. It defaults to TypedEntity.
    */
   public static function getClass($entity_type, $entity) {
-    $classes = &drupal_static(__METHOD__);
-    list(,, $bundle) = entity_extract_ids($entity_type, $entity);
+    static $classes = array();
+    list(,, $bundle) = static::$serviceContainer
+      ->get('entity.manager')
+      ->entityExtractIds($entity_type, $entity);
     $cid = $entity_type . ':' . $bundle;
 
     if (isset($classes[$cid])) {
@@ -38,7 +53,12 @@ class TypedEntityManager implements TypedEntityManagerInterface {
     }
 
     $cached_classes = array();
-    if ($cache = cache_get('typed_entity_classes', 'cache_bootstrap')) {
+    if (
+      $cache = static::$serviceContainer
+        ->get('system.cache.manager')
+        ->getController('cache_bootstrap')
+        ->get('typed_entity_classes')
+    ) {
       $cached_classes = $cache->data;
     }
 
@@ -79,7 +99,9 @@ class TypedEntityManager implements TypedEntityManagerInterface {
    *   An array of class name candidates.
    */
   protected static function getClassNameCandidates($entity_type, $bundle = NULL) {
-    $candidates = module_invoke_all('typed_entity_registry_info');
+    $candidates = static::$serviceContainer
+      ->get('module_handler')
+      ->invokeAll('typed_entity_registry_info');
     $candidate_entity_type = $candidate_bundle = '';
     foreach ($candidates as $candidate) {
       if ($candidate['entity_type'] != $entity_type) {
@@ -162,6 +184,13 @@ class TypedEntityManager implements TypedEntityManagerInterface {
     $input = ucwords($input);
     $parts = explode(' ', $input);
     return implode('', $parts);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function setServiceContainer(ContainerInterface $service_container) {
+    static::$serviceContainer = $service_container;
   }
 
 }

@@ -7,6 +7,11 @@
 
 namespace Drupal\typed_entity\TypedEntity;
 
+use Drupal\service_container\DependencyInjection\ContainerInterface;
+use Drupal\typed_entity\Entity\EntityManagerInterface;
+use Drupal\typed_entity\Entity\EntityWrapperServiceInterface;
+use Drupal\typed_entity\System\CacheManagerInterface;
+
 interface TypedEntityManagerInterface {
 
   /**
@@ -32,5 +37,13 @@ interface TypedEntityManagerInterface {
    *   The camelized string.
    */
   public static function camelize($input);
+
+  /**
+   * Sets the service container.
+   *
+   * @param ContainerInterface $service_container
+   *   The container to set for the TypedEntityManager.
+   */
+  public static function setServiceContainer(ContainerInterface $service_container);
 
 }

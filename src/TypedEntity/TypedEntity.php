@@ -7,7 +7,9 @@
 
 namespace Drupal\typed_entity\TypedEntity;
 
-use Drupal\service_container\DependencyInjection\Container;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\typed_entity\Entity\EntityWrapperServiceInterface;
+use Drupal\typed_entity\Entity\EntityManagerInterface;
 use Drupal\typed_entity\Exception\TypedEntityException;
 
 class TypedEntity implements TypedEntityInterface {
@@ -48,12 +50,35 @@ class TypedEntity implements TypedEntityInterface {
   protected $wrapper;
 
   /**
+   * The entity manager.
+   *
+   * @var EntityManagerInterface
+   */
+  protected $entityManager;
+
+  /**
+   * The entity metadata service.
+   *
+   * @var EntityWrapperServiceInterface
+   */
+  protected $entityMetadataService;
+
+  /**
+   * The module handler service.
+   *
+   * @var ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
    * Constructs a TypedEntity object.
    *
-   * @param Container $container
-   *   The service container.
-   * @param string $entity_type
-   *   The type of the entity.
+   * @param EntityManagerInterface $entity_manager
+   *   The service to interact with the entity system.
+   * @param EntityWrapperServiceInterface $entity_metadata_service
+   *   The service that wraps an entity.
+   * @param ModuleHandlerInterface $module_handler
+   *   The service to interact with modules.
    * @param int $entity_id
    *   The entity ID.
    * @param object $entity
@@ -64,7 +89,7 @@ class TypedEntity implements TypedEntityInterface {
    * @throws \Drupal\typed_entity\Exception\TypedEntityException
    * @throws \EntityMalformedException
    */
-  public function __construct($entity_type, $entity_id = NULL, $entity = NULL, $bundle = NULL) {
+  public function __construct(EntityManagerInterface $entity_manager, EntityWrapperServiceInterface $entity_metadata_service, ModuleHandlerInterface $module_handler, $entity_type, $entity_id = NULL, $entity = NULL, $bundle = NULL) {
     if (empty($entity_type)) {
       throw new TypedEntityException('You need to provide the entity type for the TypedEntity.');
     }
@@ -75,6 +100,9 @@ class TypedEntity implements TypedEntityInterface {
     $this->entityId = $entity_id;
     $this->entity = $entity;
     $this->bundle = $bundle;
+    $this->entityManager = $entity_manager;
+    $this->entityMetadataService = $entity_metadata_service;
+    $this->moduleHandler = $module_handler;
   }
 
   /**
@@ -88,7 +116,7 @@ class TypedEntity implements TypedEntityInterface {
       // This means that somehow we do not have neither entity nor entity ID.
       throw new TypedEntityException('You need to provide the fully loaded entity or the entity ID.');
     }
-    list($entity_id, , $bundle) = entity_extract_ids($this->getEntityType(), $this->entity);
+    list($entity_id, , $bundle) = $this->entityManager->entityExtractIds($this->getEntityType(), $this->entity);
     $this->entityId = $entity_id;
     $this->bundle = $bundle;
 
@@ -107,7 +135,7 @@ class TypedEntity implements TypedEntityInterface {
       // We do not have neither entity nor ID. We cannot load.
       return NULL;
     }
-    $entities = entity_load($this->getEntityType(), array($this->getEntityId()));
+    $entities = $this->entityManager->entityLoad($this->getEntityType(), array($this->getEntityId()));
     $this->entity = isset($entities[$this->getEntityId()]) ? $entities[$this->getEntityId()] : NULL;
     return $this->entity;
   }
@@ -127,7 +155,7 @@ class TypedEntity implements TypedEntityInterface {
       return $this->bundle;
     }
 
-    list($entity_id, , $bundle) = entity_extract_ids($this->getEntityType(), $this->getEntity());
+    list($entity_id, , $bundle) = $this->entityManager->entityExtractIds($this->getEntityType(), $this->getEntity());
     $this->entityId = $entity_id;
     $this->bundle = $bundle;
     return $this->bundle;
@@ -140,11 +168,7 @@ class TypedEntity implements TypedEntityInterface {
     if (isset($this->wrapper)) {
       return $this->wrapper;
     }
-    if (!\ServiceContainer::hasService('entity.wrapper')) {
-      throw new TypedEntityException('Unable to find the entity wrapper service');
-    }
-    $this->wrapper = \ServiceContainer::service('entity.wrapper')
-      ->wrap($this->getEntityType(), $this->getEntity());
+    $this->wrapper = $this->entityMetadataService->wrap($this->getEntityType(), $this->getEntity());
     return $this->wrapper;
   }
 
