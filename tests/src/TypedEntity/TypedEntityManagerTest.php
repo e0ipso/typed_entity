@@ -7,6 +7,12 @@
 
 namespace Drupal\typed_entity\Tests;
 
+use Drupal\service_container\DependencyInjection\Container;
+use Drupal\typed_entity\ServiceContainer\ServiceProvider\TypedEntityServiceProvider;
+use Drupal\typed_entity\System\ArrayCacheController;
+use Drupal\typed_entity\TypedEntity\TypedEntityManager;
+use Mockery as m;
+
 $loader = require __DIR__ . '/../../vendor/autoload.php';
 
 /** @var callable $autoloader_init */
@@ -16,34 +22,26 @@ if ($autoloader_init && $autoloader_init !== TRUE) {
   $autoloader_init($loader)->register();
 }
 
-
-use Drupal\service_container\DependencyInjection\Container;
-use Drupal\typed_entity\ServiceContainer\ServiceProvider\TypedEntityServiceProvider;
-use Drupal\typed_entity\System\ArrayCacheController;
-use Drupal\typed_entity\TypedEntity\TypedEntity;
-use Drupal\typed_entity\TypedEntity\TypedEntityManager;
-use Mockery as m;
-
 /**
- * @coversDefaultClass \Drupal\typed_entity\TypedEntity\TypedEntity
- * @group dic
+ * Class TypedEntityManagerTest
+ *
+ * @coversDefaultClass Drupal\typed_entity\TypedEntity\TypedEntityManager
+ * @package Drupal\typed_entity\Tests
  */
-class TypedEntityTest extends \PHPUnit_Framework_TestCase {
+class TypedEntityManagerTest extends \PHPUnit_Framework_TestCase {
 
   const TEST_ENTITY_ID = 1;
   const TEST_ENTITY_TYPE = 'node';
 
   /**
-   * Local typed entity.
+   * Tests that ::create() works properly.
    *
-   * @var TypedEntity
+   * @covers ::create()
+   * @covers ::getClassNameCandidatesBundle()
+   * @covers ::getClassNameCandidatesEntity()
+   * @covers ::getClassNameCandidates()
    */
-  protected $typedEntity;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __setUp() {
+  public function test_create() {
     $provider = new TypedEntityServiceProvider();
     $service_container = new Container($provider->getContainerDefinition());
     // EntityManagerInterface
@@ -59,53 +57,31 @@ class TypedEntityTest extends \PHPUnit_Framework_TestCase {
     $mocked_cache_manager
       ->shouldReceive('getController')
       ->once()
-      ->andReturn(new ArrayCacheController('cache'));
+      ->withArgs(['cache_bootstrap'])
+      ->andReturn(new ArrayCacheController('cache_bootstrap'));
     $service_container->set('system.cache.manager', $mocked_cache_manager);
 
     // ModuleHandlerInterface
     $mocked_module_handler = m::mock('Drupal\Core\Extension\ModuleHandlerInterface');
+    require_once __DIR__ . '/../../../modules/typed_entity_example/typed_entity_example.module';
     $mocked_module_handler
       ->shouldReceive('invokeAll')
       ->once()
       ->withArgs(['typed_entity_registry_info'])
-      ->andReturn([]);
+      ->andReturn(typed_entity_example_typed_entity_registry_info());
     $mocked_module_handler
       ->shouldReceive('getModuleList')
       ->twice()
-      ->andReturn([]);
+      ->andReturn([
+        'typed_entity' => 'typed_entity',
+        'typed_entity_example' => 'typed_entity_example',
+      ]);
 
     $service_container->set('module_handler', $mocked_module_handler);
 
     TypedEntityManager::setServiceContainer($service_container);
-    $this->typedEntity = TypedEntityManager::create(static::TEST_ENTITY_TYPE, require __DIR__ . '../../data/entities/article.php');
-  }
-
-  /**
-   * Tests that TypedEntity::__construct() works properly.
-   *
-   * @covers ::__construct()
-   */
-  public function test___construct__entity() {
-    $this->assertTrue(TRUE);
-    // new TypedEntity(NULL, 1);
-  }
-
-  /**
-   * Tests that TypedEntity::__construct() works properly.
-   * @expectedException \Drupal\typed_entity\Exception\TypedEntityException
-   * @covers ::__construct()
-   */
-  public function ___test___construct__id() {
-    $this->assertTrue(TRUE);
-    // new TypedEntity(static::TEST_ENTITY_TYPE);
-  }
-
-  /**
-   * Tests that TypedEntity::getEntityId() works properly.
-   * @covers ::getEntityId()
-   */
-  public function ___test_getEntityId() {
-    // $this->assertEquals(static::TEST_ENTITY_ID, $this->typedEntity->getEntity());
+    $this->typedEntity = TypedEntityManager::create(static::TEST_ENTITY_TYPE, require __DIR__ . '/../../data/entities/article.php');
+    $this->assertInstanceOf('Drupal\typed_entity_example\TypedEntity\Node\Article', $this->typedEntity);
   }
 
   /**

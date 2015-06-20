@@ -12,6 +12,7 @@
     },
     "psr-4": {
       "Drupal\\typed_entity\\": "../src/",
+      "Drupal\\typed_entity_example\\": "../modules/typed_entity_example/src/",
       "Drupal\\typed_entity\\Tests\\": "src/"
     }
   },
