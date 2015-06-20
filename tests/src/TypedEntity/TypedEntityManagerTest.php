@@ -142,6 +142,19 @@ class TypedEntityManagerTest extends \PHPUnit_Framework_TestCase {
   }
 
   /**
+   * Tests that ::setServiceContainer() works properly.
+   *
+   * @covers ::setServiceContainer()
+   */
+  public function test_setServiceContainer() {
+    $mocked_container = m::mock('\Drupal\service_container\DependencyInjection\ContainerInterface');
+    TypedEntityManager::setServiceContainer($mocked_container);
+    $reflection_property = new \ReflectionProperty('\Drupal\typed_entity\TypedEntity\TypedEntityManager', 'serviceContainer');
+    $reflection_property->setAccessible(TRUE);
+    $this->assertEquals($mocked_container, $reflection_property->getValue());
+  }
+
+  /**
    * Returns a container definition used for testing.
    *
    * @return array
