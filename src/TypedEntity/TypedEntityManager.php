@@ -53,10 +53,12 @@ class TypedEntityManager implements TypedEntityManagerInterface {
     }
 
     $cached_classes = array();
+    /** @var \DrupalCacheInterface $cache_controller */
+    $cache_controller = static::$serviceContainer
+      ->get('system.cache.manager')
+      ->getController('cache_bootstrap');
     if (
-      $cache = static::$serviceContainer
-        ->get('system.cache.manager')
-        ->getController('cache_bootstrap')
+      $cache = $cache_controller
         ->get('typed_entity_classes')
     ) {
       $cached_classes = $cache->data;
@@ -77,7 +79,8 @@ class TypedEntityManager implements TypedEntityManagerInterface {
         break;
       }
     }
-    cache_set('typed_entity_classes', $classes, 'cache_bootstrap');
+    $cache_controller
+      ->set('typed_entity_classes', $classes, 'cache_bootstrap');
 
     return $classes[$cid];
   }
@@ -144,7 +147,10 @@ class TypedEntityManager implements TypedEntityManagerInterface {
   protected static function getClassNameCandidatesEntity($entity_type) {
     $names = array();
     $class_name_entity_type = 'Typed' . static::camelize($entity_type);
-    foreach (module_list() as $module_name) {
+    $module_list = static::$serviceContainer
+      ->get('module_handler')
+      ->getModuleList();
+    foreach ($module_list as $module_name) {
       $names[] = '\\Drupal\\' . $module_name . '\\TypedEntity\\' . $class_name_entity_type;
     }
 
@@ -169,7 +175,10 @@ class TypedEntityManager implements TypedEntityManagerInterface {
       return $names;
     }
     $class_name_bundle = 'Typed' . static::camelize($entity_type) . static::camelize($bundle);
-    foreach (module_list() as $module_name) {
+    $module_list = static::$serviceContainer
+      ->get('module_handler')
+      ->getModuleList();
+    foreach ($module_list as $module_name) {
       $names[] = '\\Drupal\\' . $module_name . '\\TypedEntity\\' . $class_name_bundle;
     }
 
