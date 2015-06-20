@@ -57,10 +57,7 @@ class TypedEntityManager implements TypedEntityManagerInterface {
     $cache_controller = static::$serviceContainer
       ->get('system.cache.manager')
       ->getController('cache_bootstrap');
-    if (
-      $cache = $cache_controller
-        ->get('typed_entity_classes')
-    ) {
+    if ($cache = $cache_controller->get('typed_entity_classes', 'cache_bootstrap')) {
       $cached_classes = $cache->data;
     }
 
@@ -79,8 +76,7 @@ class TypedEntityManager implements TypedEntityManagerInterface {
         break;
       }
     }
-    $cache_controller
-      ->set('typed_entity_classes', $classes, 'cache_bootstrap');
+    $cache_controller->set('typed_entity_classes', $classes);
 
     return $classes[$cid];
   }

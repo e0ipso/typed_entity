@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return (object) array(
   'title' => 'Foo',
   'uid' => 1,
   'status' => 1,

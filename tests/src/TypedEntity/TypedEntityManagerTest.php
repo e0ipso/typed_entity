@@ -7,6 +7,8 @@
 
 namespace Drupal\typed_entity\Tests;
 
+define('CACHE_PERMANENT', 0);
+
 use Drupal\service_container\DependencyInjection\Container;
 use Drupal\typed_entity\ServiceContainer\ServiceProvider\TypedEntityServiceProvider;
 use Drupal\typed_entity\System\ArrayCacheController;
@@ -34,29 +36,28 @@ class TypedEntityManagerTest extends \PHPUnit_Framework_TestCase {
   const TEST_ENTITY_TYPE = 'node';
 
   /**
-   * Helper function to create a typed entity.
-   *
-   * @param string $entity_type
-   * @param object $entity
-   *
-   * @return \Drupal\typed_entity\TypedEntity\TypedEntityInterface
+   * Set up.
    */
-  protected static function createTypedEntity($entity_type, $entity) {
+  public function setUp() {
     $provider = new TypedEntityServiceProvider();
     $service_container = new Container($provider->getContainerDefinition());
     // EntityManagerInterface
     $mocked_entity_manager = m::mock('\Drupal\typed_entity\Entity\EntityManagerInterface');
     $mocked_entity_manager
       ->shouldReceive('entityExtractIds')
-      ->once()
-      ->andReturn([static::TEST_ENTITY_ID, NULL, 'article']);
+      ->andReturnUsing(function ($entity_type, $entity) {
+        $bundle = 'invalid';
+        if ($entity_type == 'node') {
+          $bundle = empty($entity->type) ? 'invalid' : $entity->type;
+        }
+        return [1, 1, $bundle];
+      });
     $service_container->set('entity.manager', $mocked_entity_manager);
 
     // CacheManagerInterface
     $mocked_cache_manager = m::mock('Drupal\typed_entity\System\CacheManagerInterface');
     $mocked_cache_manager
       ->shouldReceive('getController')
-      ->once()
       ->withArgs(['cache_bootstrap'])
       ->andReturn(new ArrayCacheController('cache_bootstrap'));
     $service_container->set('system.cache.manager', $mocked_cache_manager);
@@ -66,21 +67,17 @@ class TypedEntityManagerTest extends \PHPUnit_Framework_TestCase {
     require_once __DIR__ . '/../../../modules/typed_entity_example/typed_entity_example.module';
     $mocked_module_handler
       ->shouldReceive('invokeAll')
-      ->once()
       ->withArgs(['typed_entity_registry_info'])
       ->andReturn(typed_entity_example_typed_entity_registry_info());
     $mocked_module_handler
       ->shouldReceive('getModuleList')
-      ->twice()
       ->andReturn([
         'typed_entity' => 'typed_entity',
         'typed_entity_example' => 'typed_entity_example',
       ]);
 
     $service_container->set('module_handler', $mocked_module_handler);
-
     TypedEntityManager::setServiceContainer($service_container);
-    return TypedEntityManager::create($entity_type, $entity);
   }
 
   /**
@@ -92,8 +89,56 @@ class TypedEntityManagerTest extends \PHPUnit_Framework_TestCase {
    * @covers ::getClassNameCandidates()
    */
   public function test_create() {
-    $typed_article = $this::createTypedEntity(static::TEST_ENTITY_TYPE, require __DIR__ . '/../../data/entities/article.php');
+    $typed_article = TypedEntityManager::create('node', require __DIR__ . '/../../data/entities/article.php');
     $this->assertInstanceOf('Drupal\typed_entity_example\TypedEntity\Node\Article', $typed_article);
+  }
+
+  /**
+   * Tests that ::getClass works properly.
+   *
+   * @dataProvider getClassProvider
+   *
+   * @covers ::getClass()
+   *
+   * @covers ::getClassNameCandidatesBundle()
+   * @covers ::getClassNameCandidatesEntity()
+   */
+  public function test_getClass($entity_type, $entity, $expected) {
+    $this->assertEquals($expected, TypedEntityManager::getClass($entity_type, $entity));
+  }
+
+  /**
+   * Data provider for getClass.
+   */
+  public function getClassProvider() {
+    return [
+      ['node', require __DIR__ . '/../../data/entities/article.php', '\Drupal\typed_entity_example\TypedEntity\Node\Article'],
+      ['node', new \stdClass(), '\Drupal\typed_entity_example\TypedEntity\TypedNode'],
+      ['invalid', new \stdClass(), '\Drupal\typed_entity\TypedEntity\TypedEntity'],
+    ];
+  }
+
+  /**
+   * Tests that ::camelize() works properly.
+   *
+   * @dataProvider camelizeProvider
+   *
+   * @covers ::camelize()
+   */
+  public function test_camelize($given, $expected) {
+    $this->assertEquals($expected, TypedEntityManager::camelize($given));
+  }
+
+  /**
+   * Provider for camelize.
+   */
+  public function camelizeProvider() {
+    return [
+      ['abc_def-ghi', 'AbcDefGhi'],
+      ['1234', '1234'],
+      ['1-a>234', '1A>234'],
+      ['', ''],
+    ];
   }
 
   /**
