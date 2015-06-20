@@ -34,14 +34,14 @@ class TypedEntityManagerTest extends \PHPUnit_Framework_TestCase {
   const TEST_ENTITY_TYPE = 'node';
 
   /**
-   * Tests that ::create() works properly.
+   * Helper function to create a typed entity.
    *
-   * @covers ::create()
-   * @covers ::getClassNameCandidatesBundle()
-   * @covers ::getClassNameCandidatesEntity()
-   * @covers ::getClassNameCandidates()
+   * @param string $entity_type
+   * @param object $entity
+   *
+   * @return \Drupal\typed_entity\TypedEntity\TypedEntityInterface
    */
-  public function test_create() {
+  protected static function createTypedEntity($entity_type, $entity) {
     $provider = new TypedEntityServiceProvider();
     $service_container = new Container($provider->getContainerDefinition());
     // EntityManagerInterface
@@ -80,8 +80,20 @@ class TypedEntityManagerTest extends \PHPUnit_Framework_TestCase {
     $service_container->set('module_handler', $mocked_module_handler);
 
     TypedEntityManager::setServiceContainer($service_container);
-    $this->typedEntity = TypedEntityManager::create(static::TEST_ENTITY_TYPE, require __DIR__ . '/../../data/entities/article.php');
-    $this->assertInstanceOf('Drupal\typed_entity_example\TypedEntity\Node\Article', $this->typedEntity);
+    return TypedEntityManager::create($entity_type, $entity);
+  }
+
+  /**
+   * Tests that ::create() works properly.
+   *
+   * @covers ::create()
+   * @covers ::getClassNameCandidatesBundle()
+   * @covers ::getClassNameCandidatesEntity()
+   * @covers ::getClassNameCandidates()
+   */
+  public function test_create() {
+    $typed_article = $this::createTypedEntity(static::TEST_ENTITY_TYPE, require __DIR__ . '/../../data/entities/article.php');
+    $this->assertInstanceOf('Drupal\typed_entity_example\TypedEntity\Node\Article', $typed_article);
   }
 
   /**
