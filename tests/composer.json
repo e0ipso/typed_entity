@@ -23,6 +23,10 @@
     },
     "psr-4": {
       "Drupal\\service_container\\": ["DRUPAL_CONTRIB<service_container>/src"]
+    },
+    "psr-0": {
+      "Drupal\\": ["DRUPAL_CONTRIB<service_container>/lib"],
+      "Symfony\\": ["DRUPAL_CONTRIB<service_container>/lib"]
     }
   }
 }
