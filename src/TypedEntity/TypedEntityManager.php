@@ -174,7 +174,7 @@ class TypedEntityManager implements TypedEntityManagerInterface {
     $module_list = static::$serviceContainer
       ->get('module_handler')
       ->getModuleList();
-    foreach ($module_list as $module_name) {
+    foreach (array_keys($module_list) as $module_name) {
       $names[] = '\\Drupal\\' . $module_name . '\\TypedEntity\\' . $class_name_bundle;
     }
 
