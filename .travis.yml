@@ -77,7 +77,7 @@ script:
 
   # Run the tests
   - TEST_EXIT=$(drush test-run 'Typed Entity' --uri=http://localhost)
-  - $TRAVIS_BUILD_DIR/../drupal/sites/all/modules/typed_entity/tests
+  - cd $TRAVIS_BUILD_DIR/../drupal/sites/all/modules/typed_entity/tests
   - ./run-tests.sh; TEST_PHPUNIT=$?
 
   # Exit the build
