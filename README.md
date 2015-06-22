@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/mateu-aguilo-bosch/typed_entity.svg)](https://travis-ci.org/mateu-aguilo-bosch/typed_entity) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mateu-aguilo-bosch/typed_entity/badges/quality-score.png?b=7.x-1.x)](https://scrutinizer-ci.com/g/mateu-aguilo-bosch/typed_entity/?branch=7.x-1.x)
+[![Build Status](https://travis-ci.org/mateu-aguilo-bosch/typed_entity.svg?branch=7.x-1.x)](https://travis-ci.org/mateu-aguilo-bosch/typed_entity) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mateu-aguilo-bosch/typed_entity/badges/quality-score.png?b=7.x-1.x)](https://scrutinizer-ci.com/g/mateu-aguilo-bosch/typed_entity/?branch=7.x-1.x)
 
 # Typed entity
 
