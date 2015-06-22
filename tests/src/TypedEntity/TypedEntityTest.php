@@ -18,6 +18,7 @@ if ($autoloader_init && $autoloader_init !== TRUE) {
 
 
 use Drupal\service_container\DependencyInjection\Container;
+use Drupal\typed_entity\Exception\TypedEntityException;
 use Drupal\typed_entity\ServiceContainer\ServiceProvider\TypedEntityServiceProvider;
 use Drupal\typed_entity\System\ArrayCacheController;
 use Drupal\typed_entity\TypedEntity\TypedEntity;
@@ -31,7 +32,6 @@ use Mockery as m;
 class TypedEntityTest extends \PHPUnit_Framework_TestCase {
 
   const TEST_ENTITY_ID = 1;
-  const TEST_ENTITY_TYPE = 'node';
 
   /**
    * Local typed entity.
@@ -43,69 +43,108 @@ class TypedEntityTest extends \PHPUnit_Framework_TestCase {
   /**
    * {@inheritdoc}
    */
-  public function __setUp() {
+  public function setUp() {
     $provider = new TypedEntityServiceProvider();
     $service_container = new Container($provider->getContainerDefinition());
     // EntityManagerInterface
     $mocked_entity_manager = m::mock('\Drupal\typed_entity\Entity\EntityManagerInterface');
     $mocked_entity_manager
       ->shouldReceive('entityExtractIds')
-      ->once()
-      ->andReturn([static::TEST_ENTITY_ID, NULL, 'article']);
+      ->andReturnUsing(function ($entity_type, $entity) {
+        $bundle = 'invalid';
+        $entity_id = static::TEST_ENTITY_ID;
+        if ($entity_type == 'node') {
+          $bundle = empty($entity->type) ? 'invalid' : $entity->type;
+          $entity_id = empty($entity->nid) ? static::TEST_ENTITY_ID : $entity->nid;
+        }
+        return [$entity_id, $entity_id, $bundle];
+      });
     $service_container->set('entity.manager', $mocked_entity_manager);
 
     // CacheManagerInterface
     $mocked_cache_manager = m::mock('Drupal\typed_entity\System\CacheManagerInterface');
     $mocked_cache_manager
       ->shouldReceive('getController')
-      ->once()
-      ->andReturn(new ArrayCacheController('cache'));
+      ->withArgs(['cache_bootstrap'])
+      ->andReturn(new ArrayCacheController('cache_bootstrap'));
     $service_container->set('system.cache.manager', $mocked_cache_manager);
 
     // ModuleHandlerInterface
     $mocked_module_handler = m::mock('Drupal\Core\Extension\ModuleHandlerInterface');
+    require_once __DIR__ . '/../../../modules/typed_entity_example/typed_entity_example.module';
     $mocked_module_handler
       ->shouldReceive('invokeAll')
-      ->once()
       ->withArgs(['typed_entity_registry_info'])
-      ->andReturn([]);
+      ->andReturn(typed_entity_example_typed_entity_registry_info());
     $mocked_module_handler
       ->shouldReceive('getModuleList')
-      ->twice()
-      ->andReturn([]);
+      ->andReturn([
+        'typed_entity' => 'typed_entity',
+        'typed_entity_example' => 'typed_entity_example',
+      ]);
 
     $service_container->set('module_handler', $mocked_module_handler);
-
     TypedEntityManager::setServiceContainer($service_container);
-    $this->typedEntity = TypedEntityManager::create(static::TEST_ENTITY_TYPE, require __DIR__ . '../../data/entities/article.php');
   }
 
   /**
    * Tests that TypedEntity::__construct() works properly.
    *
    * @covers ::__construct()
+   *
+   * @expectedException \Drupal\typed_entity\Exception\TypedEntityException
    */
   public function test___construct__entity() {
-    $this->assertTrue(TRUE);
-    // new TypedEntity(NULL, 1);
+    $reflection_property = new \ReflectionProperty('\Drupal\typed_entity\TypedEntity\TypedEntityManager', 'serviceContainer');
+    $reflection_property->setAccessible(TRUE);
+    $sc = $reflection_property->getValue();
+
+    new TypedEntity($sc->get('entity.manager'), $sc->get('entity.wrapper'), $sc->get('module_handler'), NULL, 1);
   }
 
   /**
    * Tests that TypedEntity::__construct() works properly.
-   * @expectedException \Drupal\typed_entity\Exception\TypedEntityException
+   *
    * @covers ::__construct()
+   *
+   * @expectedException \Drupal\typed_entity\Exception\TypedEntityException
    */
-  public function ___test___construct__id() {
-    $this->assertTrue(TRUE);
-    // new TypedEntity(static::TEST_ENTITY_TYPE);
+  public function test___construct__id() {
+    $reflection_property = new \ReflectionProperty('\Drupal\typed_entity\TypedEntity\TypedEntityManager', 'serviceContainer');
+    $reflection_property->setAccessible(TRUE);
+    $sc = $reflection_property->getValue();
+
+    new TypedEntity($sc->get('entity.manager'), $sc->get('entity.wrapper'), $sc->get('module_handler'), 'node', NULL);
   }
 
   /**
    * Tests that TypedEntity::getEntityId() works properly.
+   *
    * @covers ::getEntityId()
    */
-  public function ___test_getEntityId() {
-    // $this->assertEquals(static::TEST_ENTITY_ID, $this->typedEntity->getEntity());
+  public function test_getEntityId() {
+    $reflection_property = new \ReflectionProperty('\Drupal\typed_entity\TypedEntity\TypedEntityManager', 'serviceContainer');
+    $reflection_property->setAccessible(TRUE);
+    $sc = $reflection_property->getValue();
+
+    $article = require __DIR__ . '/../../data/entities/article.php';
+    $typed_entity = new TypedEntity($sc->get('entity.manager'), $sc->get('entity.wrapper'), $sc->get('module_handler'), 'node', NULL, $article);
+    $this->assertEquals($article->nid, $typed_entity->getEntityId());
+  }
+
+  /**
+   * Tests that TypedEntity::getEntityId() works properly.
+   *
+   * @expectedException \Drupal\typed_entity\Exception\TypedEntityException
+   *
+   * @covers ::getEntityId()
+   */
+  public function test_getEntityId_noEntity() {
+    $reflection_property = new \ReflectionProperty('\Drupal\typed_entity\TypedEntity\TypedEntityManager', 'serviceContainer');
+    $reflection_property->setAccessible(TRUE);
+    $sc = $reflection_property->getValue();
+
+    new TypedEntity($sc->get('entity.manager'), $sc->get('entity.wrapper'), $sc->get('module_handler'), 'node', NULL, NULL);
   }
 
   /**

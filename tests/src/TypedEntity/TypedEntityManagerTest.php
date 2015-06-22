@@ -36,7 +36,7 @@ class TypedEntityManagerTest extends \PHPUnit_Framework_TestCase {
   const TEST_ENTITY_TYPE = 'node';
 
   /**
-   * Set up.
+   * {@inheritdoc}
    */
   public function setUp() {
     $provider = new TypedEntityServiceProvider();
