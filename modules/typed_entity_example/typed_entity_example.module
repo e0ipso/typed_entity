@@ -49,14 +49,15 @@ function typed_entity_example_node_typed($node) {
   $typed_node = TypedEntityManager::create('node', $node);
   drupal_set_title($typed_node->title);
 
-  $typed_image = $typed_node->getImage();
-  $output = array();
-  $uri = $typed_image->uri;
-  if (!empty($uri)) {
-    $output['image'] = array(
-      '#theme' => 'image',
-      '#path' => $typed_image->uri,
-    );
+  if ($typed_image = $typed_node->getImage()) {
+    $output = array();
+    $uri = $typed_image->uri;
+    if (!empty($uri)) {
+      $output['image'] = array(
+        '#theme' => 'image',
+        '#path' => $typed_image->uri,
+      );
+    }
   }
   $output['debug'] = array(
     '#type' => 'html_tag',

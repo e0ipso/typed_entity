@@ -1,0 +1,3 @@
+tests/vendor
+tests/report
+tests/composer.lock

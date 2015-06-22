@@ -16,8 +16,15 @@ class TypedEntityServiceProvider implements ServiceProviderInterface {
    */
   public function getContainerDefinition() {
     $parameters = $services = array();
+
+    $services['entity.manager'] = array(
+      'class' => '\Drupal\typed_entity\Entity\EntityManager',
+    );
     $services['entity.wrapper'] = array(
       'class' => '\Drupal\typed_entity\Entity\EntityWrapperService',
+    );
+    $services['system.cache.manager'] = array(
+      'class' => '\Drupal\typed_entity\System\CacheManager',
     );
     return array(
       'parameters' => $parameters,
