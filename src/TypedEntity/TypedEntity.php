@@ -7,6 +7,7 @@
 
 namespace Drupal\typed_entity\TypedEntity;
 
+use Drupal\service_container\DependencyInjection\Container;
 use Drupal\typed_entity\Exception\TypedEntityException;
 
 class TypedEntity implements TypedEntityInterface {
@@ -42,13 +43,15 @@ class TypedEntity implements TypedEntityInterface {
   /**
    * The EMW
    *
-   * @var \EntityDrupalWrapper
+   * @var \EntityDrupalWrapperInterface
    */
   protected $wrapper;
 
   /**
    * Constructs a TypedEntity object.
    *
+   * @param Container $container
+   *   The service container.
    * @param string $entity_type
    *   The type of the entity.
    * @param int $entity_id
@@ -137,7 +140,11 @@ class TypedEntity implements TypedEntityInterface {
     if (isset($this->wrapper)) {
       return $this->wrapper;
     }
-    $this->wrapper = entity_metadata_wrapper($this->getEntityType(), $this->getEntity());
+    if (!\ServiceContainer::hasService('entity.wrapper')) {
+      throw new TypedEntityException('Unable to find the entity wrapper service');
+    }
+    $this->wrapper = \ServiceContainer::service('entity.wrapper')
+      ->wrap($this->getEntityType(), $this->getEntity());
     return $this->wrapper;
   }
 

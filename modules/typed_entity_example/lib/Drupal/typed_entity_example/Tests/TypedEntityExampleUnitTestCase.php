@@ -27,22 +27,10 @@ class TypedEntityExampleUnitTestCase extends \DrupalUnitTestCase {
   }
 
   /**
-   * Set up.
-   */
-  public function setUp() {
-    // Let xautoload to discover where classes live. We cannot rely on Drupal's
-    // autoloader since the database will not be ready at this point for unit
-    // tests.
-    spl_autoload_unregister('drupal_autoload_class');
-    spl_autoload_unregister('drupal_autoload_interface');
-
-    parent::setUp();
-  }
-
-  /**
    * Test logging message.
    */
-  public function testLoggingMessage() {
+  public function __testLoggingMessage() {
+    require_once __DIR__ . '/../../../../src/TypedEntity/Tests/TypedNodeArticleUnitTest.php';
     $typed_article = new TypedNodeArticleUnitTest('node', 1, NULL, 'article');
     $this->assertEqual($typed_article->getLoggingMessage(), 'User with id 1. Node with title Foo. Status 1.', 'Logging message is successful.');
   }
@@ -50,7 +38,8 @@ class TypedEntityExampleUnitTestCase extends \DrupalUnitTestCase {
   /**
    * Test camelize method.
    */
-  public function testCamelize() {
+  public function __testCamelize() {
+    require_once __DIR__ . '/../../../../../../src/TypedEntity/TypedEntityManager.php';
     $this->assertEqual(TypedEntityManager::camelize('abc_def-ghi'), 'AbcDefGhi');
     $this->assertEqual(TypedEntityManager::camelize('1234'), '1234');
     $this->assertEqual(TypedEntityManager::camelize('1-a>234'), '1A>234');

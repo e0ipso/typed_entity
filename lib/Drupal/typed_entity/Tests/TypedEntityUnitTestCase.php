@@ -27,22 +27,11 @@ class TypedEntityUnitTestCase extends \DrupalUnitTestCase {
   }
 
   /**
-   * Set up.
-   */
-  public function setUp() {
-    // Let xautoload to discover where classes live. We cannot rely on Drupal's
-    // autoloader since the database will not be ready at this point for unit
-    // tests.
-    spl_autoload_unregister('drupal_autoload_class');
-    spl_autoload_unregister('drupal_autoload_interface');
-
-    parent::setUp();
-  }
-
-  /**
    * Test logging message.
    */
-  public function testConstructor() {
+  public function __testConstructor() {
+    require_once __DIR__ . '/../../../../src/TypedEntity/TypedEntity.php';
+    require_once __DIR__ . '/../../../../src/Exception/TypedEntityException.php';
     try {
       new TypedEntity(NULL, 1);
       $this->fail('Exception was not thrown for missing entity type.');
