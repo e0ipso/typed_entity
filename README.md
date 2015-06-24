@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/mateu-aguilo-bosch/typed_entity.svg)](https://travis-ci.org/mateu-aguilo-bosch/typed_entity) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mateu-aguilo-bosch/typed_entity/badges/quality-score.png?b=7.x-1.x)](https://scrutinizer-ci.com/g/mateu-aguilo-bosch/typed_entity/?branch=7.x-1.x)
+[![Build Status](https://travis-ci.org/mateu-aguilo-bosch/typed_entity.svg?branch=7.x-1.x)](https://travis-ci.org/mateu-aguilo-bosch/typed_entity) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mateu-aguilo-bosch/typed_entity/badges/quality-score.png?b=7.x-1.x)](https://scrutinizer-ci.com/g/mateu-aguilo-bosch/typed_entity/?branch=7.x-1.x)
 
 # Typed entity
 
@@ -111,17 +111,17 @@ If you don't like the naming convention or you prefer to use something else, you
 
 ```php
 /**
- * Implements hook_module_typed_entity_registry_info().
+ * Implements hook_typed_entity_registry_info().
  */
 function custom_module_typed_entity_registry_info() {
   $items['user'] = array(
     'entity_type' => 'user',
-    'class' => '\Drupal\custom_module\Foo\Bar\User',
+    'class' => '\\Drupal\\custom_module\\Foo\\Bar\\User',
   );
-  $items['file'] = array(
+  $items['image'] = array(
     'entity_type' => 'file',
     'bundle' => 'image',
-    'class' => '\Drupal\custom_module\File\Image',
+    'class' => '\\Drupal\\custom_module\\File\\Image',
   );
 
   return $items;
