@@ -15,14 +15,7 @@ use Drupal\typed_entity\System\ArrayCacheController;
 use Drupal\typed_entity\TypedEntity\TypedEntityManager;
 use Mockery as m;
 
-$loader = require __DIR__ . '/../../vendor/autoload.php';
-
-/** @var callable $autoloader_init */
-$autoloader_init = require_once __DIR__ . '/../../vendor/mateu-aguilo-bosch/drupal-unit-autoload/drupal_unit_autoloader.php';
-if ($autoloader_init && $autoloader_init !== TRUE) {
-  // Register the class loader.
-  $autoloader_init($loader)->register();
-}
+require_once __DIR__ . '/../../vendor/mateu-aguilo-bosch/drupal-unit-autoload/autoload.php';
 
 /**
  * Class TypedEntityManagerTest

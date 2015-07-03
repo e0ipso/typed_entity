@@ -7,15 +7,7 @@
 
 namespace Drupal\typed_entity\Tests;
 
-$loader = require __DIR__ . '/../../vendor/autoload.php';
-
-/** @var callable $autoloader_init */
-$autoloader_init = require_once __DIR__ . '/../../vendor/mateu-aguilo-bosch/drupal-unit-autoload/drupal_unit_autoloader.php';
-if ($autoloader_init && $autoloader_init !== TRUE) {
-  // Register the class loader.
-  $autoloader_init($loader)->register();
-}
-
+require_once __DIR__ . '/../../vendor/mateu-aguilo-bosch/drupal-unit-autoload/autoload.php';
 
 use Drupal\service_container\DependencyInjection\Container;
 use Drupal\typed_entity\Exception\TypedEntityException;
