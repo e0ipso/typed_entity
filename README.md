@@ -2,7 +2,7 @@
 
 # Typed entity
 
-## Obsolete see [Typed Entity in drupal.org](https://www.drupal.org/project/typed_entity).
+## Obsolete: see [Typed Entity in drupal.org](https://www.drupal.org/project/typed_entity).
 
 _Use Typed Entity as a namespace for your business logic. It **provides a scope to place your business logic**, and help you keep your global scope clean of myriads of small functions._
 
